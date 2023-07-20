@@ -1,0 +1,49 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Orçamentos em digitação
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Orçamentos em digitação</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+
+    <div class="col-12 table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Nº orçamento</th>
+              <th scope="col">Orçamento</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orcamentos %}
+            <tr>
+                <td>{{o.id}}</td>
+                <td class="">{{o}}</td>
+                <td class="">{{o.status}}</td>
+                <td><a href="{% url 'finalizar_digitacao' o.id%}" class="btn" title="Concluir orçamento"><i class="fa-solid fa-pen-to-square text-primary"></i>Concluir orçamento</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+</div>
+</div>
+
+<div class="row">
+    <div style="height: 400px; text-align: center;">
+      <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+{% endblock %}

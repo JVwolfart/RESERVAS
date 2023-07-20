@@ -1,0 +1,47 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Home
+{% endblock%}
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Sistema de reservas</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="row">
+    <div class="row py-5">
+    
+        <div class="col-md-3 col-6 mb-5">
+    
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'clientes'%}">
+                    <img src="{% static 'img/icone_clientes.jpg'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Cadastro prévio de clientes
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_empreendimentos'%}">
+                    <img src="{% static 'img/icone_empreendimentos.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Lista de empreendimentos
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_orçamentos_concluidos'%}">
+                    <img src="{% static 'img/icone_acomodacoes.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Lista orçamentos concluídos
+                </a>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+{% endblock %}

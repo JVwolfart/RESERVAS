@@ -1,0 +1,44 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Empreendimentos
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Lista de empreendimentos cadastrados</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <div class="col-12 table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Nome</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in empreendimentos %}
+            <tr>
+                <td>{{c.nome}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+</div>
+</div>
+
+
+<div class="row">
+    <div style="height: 400px; text-align: center;">
+      <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+{% endblock %}

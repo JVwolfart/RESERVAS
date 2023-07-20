@@ -1,0 +1,212 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Dados do cliente
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alteração de dados do cliente</h1>
+<a href="{% url 'manut_cliente' %}" class="btn btn-outline-info">Retornar</a>
+{% include 'parciais/_messages.html'%}
+
+
+<div class="col-12">
+  <div class="mb-3">
+    <label class="form-label">Nome do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.nome}}" disabled>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Telefone do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.telefone}}" disabled>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Identificação/cidade do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.obs}}" disabled>
+  </div>
+</div>
+
+<div class="col-12">
+
+    <form method="post" action="{% url 'alterar_dados_cliente' cliente.id%}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Nome completo do cliente: </label>
+        <input type="text" class="form-control" name="nome_completo" placeholder="Nome completo do cliente" value="{{dados_cliente.nome_completo}}">
+      </div>
+
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-8">
+            <label class="form-label">CPF do cliente: </label>
+            <input type="text" class="form-control" placeholder="CPF" id="cpf" name="cpf" value="{{dados_cliente.cpf}}">    
+            <small id="feedback" hidden></small>
+          </div>
+          <div class="col-4">
+            <div class="row">
+              <label for="">Verifique se o CPF informado é válido: </label>
+            </div>
+
+            <div class="row">
+              <button type="button" class="btn btn-primary mt-2" onclick="CPFValido()">Verifica CPF</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">CEP do cliente: </label>
+        <input type="text" class="form-control" name="cep" id="cep" placeholder="CEP do cliente" value="{{dados_cliente.cep}}" onblur="busca_cep()">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Rua do cliente: </label>
+        <input type="text" class="form-control dado_cliente" name="rua" id="rua" placeholder="Rua do cliente" value="{{dados_cliente.rua}}" disabled>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Bairro do cliente: </label>
+        <input type="text" class="form-control dado_cliente" name="bairro" id="bairro" placeholder="Bairro do cliente" value="{{dados_cliente.bairro}}" disabled>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-8">
+          <label class="form-label">Cidade do cliente: </label>
+          <input type="text" class="form-control dado_cliente" name="cidade" id="cidade" placeholder="Cidade do cliente" value="{{dados_cliente.cidade}}" disabled>
+        </div>
+
+        <div class="col-sm-4">
+          <label class="form-label">Estado do cliente: </label>
+          <input type="text" class="form-control dado_cliente" name="estado" id="estado" placeholder="Estado do cliente" value="{{dados_cliente.estado}}" disabled>
+        </div>
+      </div>
+
+      <div class="my-3">
+        <input type="checkbox" class="btn-check" id="manual" onclick="habilitar_campos()">
+        <label class="btn btn-outline-success" for="manual">Digitar manualmente o endereço</label>      
+      </div>
+
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary" onclick="habilitar_campos_submit()">Alterar dados do cliente</button>
+      </div>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+  $("#cpf").mask("000.000.000-00");
+  $("#cep").mask("00.000-000");
+
+  function habilitar_campos(){
+    let botoes = document.getElementsByClassName("dado_cliente");
+    for(i = 0; i < botoes.length; i++){
+      botoes[i].disabled = !botoes[i].disabled;
+    }
+  }
+
+  function habilitar_campos_submit(){
+    let botoes = document.getElementsByClassName("dado_cliente");
+    for(i = 0; i < botoes.length; i++){
+      botoes[i].disabled = false;
+    }
+  }
+
+  function busca_cep(){
+    let cep = document.getElementById("cep").value;
+    cep = cep.slice(0, 2) + cep.slice(3, 6) + cep.slice(7, 10);
+    if (cep.length === 8){
+      let url = "https://viacep.com.br/ws/" + cep + "/json/"
+    let dados = fetch(url).then(dados => dados.json()).then(dados => {
+      console.log(dados);
+      if (!dados.erro){
+        let rua = dados.logradouro;
+        let bairro = dados.bairro;
+        let cidade = dados.localidade;
+        let estado = dados.uf;
+        if (rua != undefined && bairro != undefined && cidade != undefined && estado != undefined){
+          document.getElementById('rua').value = rua;
+          document.getElementById('bairro').value = bairro;
+          document.getElementById('cidade').value = cidade;
+          document.getElementById('estado').value = estado;
+        }
+      }else{
+        alert("CEP inválido ou não localizado. Verifique!!!!\nSe necessário, digite manualmente os dados, habilitando no botão 'Digitar manualmente o endereço'");
+        document.getElementById('rua').value = "";
+        document.getElementById('bairro').value = "";
+        document.getElementById('cidade').value = "";
+        document.getElementById('estado').value = "";
+      }
+    });
+
+    console.log(dados)
+    } else{
+      alert("ATENÇÃO: CEP deve ter exatamente 10 caracteres");
+      document.getElementById('rua').value = "";
+      document.getElementById('bairro').value = "";
+      document.getElementById('cidade').value = "";
+      document.getElementById('estado').value = "";
+    }
+    
+  }
+
+  function TestaCPF(strCPF) {
+    var Soma;
+    var Resto;
+    Soma = 0;
+  if (strCPF == "00000000000") return false;
+  if (strCPF == "11111111111") return false;
+  if (strCPF == "22222222222") return false;
+  if (strCPF == "33333333333") return false;
+  if (strCPF == "44444444444") return false;
+  if (strCPF == "55555555555") return false;
+  if (strCPF == "66666666666") return false;
+  if (strCPF == "77777777777") return false;
+  if (strCPF == "88888888888") return false;
+  if (strCPF == "99999999999") return false;
+
+  for (i=1; i<=9; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (11 - i);
+  Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(9, 10)) ) return false;
+
+  Soma = 0;
+    for (i = 1; i <= 10; i++) Soma = Soma + parseInt(strCPF.substring(i-1, i)) * (12 - i);
+    Resto = (Soma * 10) % 11;
+
+    if ((Resto == 10) || (Resto == 11))  Resto = 0;
+    if (Resto != parseInt(strCPF.substring(10, 11) ) ) return false;
+    return true;
+  }
+
+  function CPFValido(){
+    let cpf = document.getElementById("cpf").value;
+    cpf = cpf.slice(0, 3) + cpf.slice(4, 7) + cpf.slice(8, 11) + cpf.slice(12, 14);
+    if (!TestaCPF(cpf)){
+      alert("CPF inválido!!!");
+      document.getElementById("cpf").setAttribute("class", "form-control is-invalid");
+      document.getElementById("feedback").hidden = false;
+      document.getElementById('feedback').setAttribute("class", "text-danger");
+      document.getElementById("feedback").textContent = "CPF inválido";
+    } else{
+      document.getElementById("cpf").setAttribute("class", "form-control");
+      document.getElementById("feedback").hidden = false;
+      document.getElementById('feedback').setAttribute("class", "text-success");
+      document.getElementById("feedback").textContent = "CPF válido";
+    }
+  }
+
+</script>
+{% endblock %}

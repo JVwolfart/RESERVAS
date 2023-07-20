@@ -1,0 +1,19 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Orçamentos em digitação
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Orçamentos em digitação</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+  <iframe src="{{orcamento.img_orcamento}}" title="{{orcamento.orcamento}}" frameborder="0" width="100%" height="500px"></iframe>
+  <a href="{{orcamento.img_orcamento}}">Clique aqui</a>
+</div>
+
+{% endblock %}

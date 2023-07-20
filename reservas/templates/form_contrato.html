@@ -1,0 +1,385 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Contrato de reserva de temporada
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Contrato de reserva de temporada</h1>
+<a href="{% url 'lista_orçamentos_concluidos' %}" class="btn btn-outline-info">Volta para orçamentos concluídos</a>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-3">
+        <label class="form-label">Nº do orçamento: </label>
+        <input type="text" class="form-control"  value="{{orcamento.id}}" disabled>
+      </div>
+      
+      <div class="col-sm-6"></div>
+
+      <div class="col-sm-3">
+        <label class="form-label">Telefone do cliente: </label>
+        <input type="text" class="form-control"  value="{{orcamento.cliente.telefone}}" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-7">
+        <label class="form-label">Nome do cliente: </label>
+        <input type="text" class="form-control"  value="{{orcamento.cliente.nome}}" disabled>
+      </div>
+      <div class="col-sm-5">
+        <label class="form-label">Identificação/cidade do cliente: </label>
+        <input type="text" class="form-control"  value="{{orcamento.cliente.obs}}" disabled>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-3">
+        <label for="" class="form-label">Nº de ocupantes</label>
+        <input type="number" class="form-control" value="{{orcamento.n_ocupantes}}" disabled>
+      </div>
+
+      <div class="col-sm-9">
+        <label for="" class="form-label">Observação sobre ocupantes</label>
+        <input type="text" class="form-control" value="{{orcamento.obs_n_ocupantes}}" disabled>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="row">
+
+      <div class="col-sm-4">
+        <label for="" class="form-label">Tipo de período</label>
+        <input type="text" class="form-control" value="{{orcamento.periodo}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label for="" class="form-label">Acomodação</label>
+        <input type="text" class="form-control" value="{{orcamento.acomodacao}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label for="" class="form-label">Empreendimento</label>
+        <input type="text" class="form-control" value="{{orcamento.acomodacao.empreendimento}}" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-4">
+        <label class="form-label">Data de entrada: </label>
+        <input type="text" class="form-control" value="{{orcamento.data_entrada}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label class="form-label">Dia da entrada: </label>
+        <input type="text" class="form-control" value="{{orcamento.dia_entrada}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label class="form-label">Check-in: </label>
+        <input type="text" class="form-control" value="{{orcamento.checkin}}" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-4">
+        <label class="form-label">Data de saída: </label>
+        <input type="text" class="form-control" value="{{orcamento.data_saida}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label class="form-label">Dia da saída: </label>
+        <input type="text" class="form-control" value="{{orcamento.dia_saida}}" disabled>
+      </div>
+
+      <div class="col-sm-4">
+        <label class="form-label">Check-out: </label>
+        <input type="text" class="form-control" value="{{orcamento.checkout}}" disabled>
+      </div>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <div class="row">
+      <div class="col-sm-3">
+        <label class="form-label">Total de diárias da reserva: </label>
+        <input type="text" class="form-control" value="{{orcamento.n_dias}}" id="n_dias" disabled>
+      </div>
+
+      <div class="col-sm-3">
+        <label class="form-label">Diária cheia ou pernoite?</label>
+        {% if orcamento.diaria_cheia %}
+          <input type="text" class="form-control" value="Diária cheia" disabled>
+        {% else %}
+          <input type="text" class="form-control" value="Diária Pernoite" disabled>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<hr>
+
+<div class="col-12">
+
+    <form method="post" action="{% url 'gerar_contrato' orcamento.id%}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="" class="form-label">Valor da diária</label>
+            <input type="text" class="form-control" id="valor_diaria" name="valor_diaria" value="{{orcamento.valor_diaria}}" disabled>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="" class="form-label">Taxa de limpeza</label>
+            <input type="text" class="form-control" id="taxa_limpeza" name="taxa_limpeza" value="{{orcamento.taxa_limpeza}}" disabled>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="" class="form-label">Descontos</label>
+            <input type="text" class="form-control" id="descontos" name="descontos" value="{{orcamento.descontos}}" disabled>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="" class="form-label">Acréscimos</label>
+            <input type="text" class="form-control" id="acrescimos" name="acrescimos" value="{{orcamento.acrescimos}}" disabled>
+          </div>
+          
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="" class="form-label">Valor pacote</label>
+            <input type="text" class="form-control" id="valor_pacote" name="valor_pacote" value="{{orcamento.valor_pacote}}" disabled>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="" class="form-label">Quantidade de dias do pacote</label>
+            <input type="text" class="form-control" id="dias_pacote" name="dias_pacote" value="{{orcamento.dias_pacote}}" disabled>  
+          </div>
+
+          <div class="col-sm-3">
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-6">
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control dado_orc" id="tot_diarias" name="tot_diarias" value="{{total_diarias}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-4"> ->>> Total das diárias</span>
+              </div>
+            </div>
+          </div>
+    
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control dado_orc" id="tot_pacote" name="tot_pacote" value="{{orcamento.valor_pacote}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-4"> ->>> Total de valor pacote</span>
+              </div>
+            </div>
+          </div>
+    
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control dado_orc" id="tot_taxa_limpeza" name="tot_taxa_limpeza" value="{{orcamento.taxa_limpeza}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-4"> ->>> Taxa de limpeza</span>
+              </div>
+            </div>
+          </div>
+    
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control dado_orc" id="tot_acrescimos" name="tot_acrescimos" value="{{orcamento.acrescimos}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-4"> ->>> Acréscimos</span>
+              </div>
+            </div>
+          </div>
+    
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control text-danger dado_orc" id="tot_descontos" name="tot_descontos" value="{{orcamento.descontos}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-4 text-danger"> ->>> Descontos</span>
+              </div>
+            </div>
+          </div>
+    
+          <div class="mb-3">
+            <div class="row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control fs-3 dado_orc" id="tot_reserva" name="tot_reserva" value="{{orcamento.total_valor_reserva}}" disabled style="text-align: right;">
+              </div>
+    
+              <div class="col-sm-6">
+                <span class="fs-3"> Total da reserva</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <select name="" id="cond_pag_orc" class="form-select" onchange="pega_cond_pag_orc()">
+            <option value="{{cond_pag}}" selected>Condição padrão</option>
+            {% for c in cond_pag_contrato %}
+            <option value="{{c.descricao}}">{{c.identificacao}}</option>
+            {% endfor %}
+          </select>
+          <label for="" class="form-label">Condições de pagamento</label>
+          <textarea class="form-control" name="cond_pag" id="cond_pag" cols="30" rows="10">{{cond_pag}}</textarea>
+        </div>
+
+      </div>
+
+        <div class="row">
+          <div class="col-6">
+            <select name="" id="conta_deposito_select" class="form-select" onchange="pega_conta_deposito()">
+              <option value="" selected>Selecione uma conta para depósito</option>
+              {% for o in contas_deposito %}
+              <option value="{{o.descricao}}">{{o.identificacao}}</option>
+              {% endfor %}
+            </select>
+            <label for="" class="form-label">Dados para depósito</label>
+            <textarea class="form-control" name="conta_deposito" id="conta_deposito" cols="30" rows="10"></textarea>
+          </div>
+
+          <div class="col-6">
+            <select name="" id="obs_orc" class="form-select" onchange="pega_obs_orc()">
+              <option value="" selected>Selecione uma observação</option>
+              {% for o in aviso_contrato %}
+              <option value="{{o.descricao}}">{{o.identificacao}}</option>
+              {% endfor %}
+            </select>
+            <label for="" class="form-label">Observações</label>
+            <textarea class="form-control" name="obs" id="obs" cols="30" rows="10"></textarea>
+          </div>
+        </div>
+
+        
+
+        <div class="col-12">
+          <select name="" id="info_adic" class="form-select" onchange="pega_info_adic()">
+            <option value="" selected>Selecione uma observação</option>
+            {% for i in info_adic_contrato %}
+            <option value="{{i.descricao}}">{{i.identificacao}}</option>
+            {% endfor %}
+          </select>
+          <label for="" class="form-label">Informações adicionais</label>
+          <textarea class="form-control" name="info_adicionais" id="info_adicionais" cols="30" rows="15"></textarea>
+        </div>
+
+
+      <div class="mb-3">
+
+      </div>
+      <button type="submit" class="btn btn-primary" onclick="habilitar_campos_submit()">Gerar contrato</button>
+      <a class="btn btn-danger" href="{% url 'lista_orçamentos_concluidos' %}">Cancelar e retornar</a>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+
+  /*$("#tot_diarias").mask("R$ 0.000,00");*/
+
+  function calcular_orcamento(){
+    var diaria = parseFloat(document.getElementById("valor_diaria").value);
+    var n_dias = parseInt(document.getElementById("n_dias").value);
+    var taxa_limpeza = parseFloat(document.getElementById("taxa_limpeza").value);
+    var descontos = -parseFloat(document.getElementById("descontos").value);
+    var acrescimos = parseFloat(document.getElementById("acrescimos").value);
+    var valor_pacote = parseFloat(document.getElementById("valor_pacote").value);
+    var dias_pacote = parseFloat(document.getElementById("dias_pacote").value);
+    var total_diarias = 0;
+    if(valor_pacote === 0){
+      total_diarias = n_dias*diaria;
+    } else{
+      total_diarias = (n_dias-dias_pacote)*diaria;
+    }
+    document.getElementById("tot_diarias").value = "R$ " + total_diarias.toFixed(2);
+    document.getElementById("tot_pacote").value = "R$ " + valor_pacote.toFixed(2);
+    document.getElementById("tot_taxa_limpeza").value = "R$ " + taxa_limpeza.toFixed(2);
+    document.getElementById("tot_descontos").value = "R$ " + descontos.toFixed(2);
+    document.getElementById("tot_acrescimos").value = "R$ " + acrescimos.toFixed(2);
+    var total_geral = total_diarias+taxa_limpeza+descontos+acrescimos+valor_pacote;
+    document.getElementById("tot_reserva").value = "R$ " + total_geral.toFixed(2);
+    var metade = total_geral/2; 
+    var saldo = total_geral-metade;
+    var cond = "CONDIÇÃO DE PAGAMENTO PADRÃO:" + "\n\n- DEPÓSITO A VISTA PIX PARA A CONFIRMAÇÃO DA RESERVA R$ " + metade.toFixed(2) + "\n- VALOR A SER PAGO NA CHEGADA AO RESIDENCIAL = R$ " + saldo.toFixed(2) + " + OCUPANTES ADICIONAIS FORA OS CONTRATADOS NA RESERVA (SE HOUVER)" + "\n\nVALOR A SER PAGO NA SAÍDA : CUSTO DO AR CONDICIONADO SE OPTAR POR ESTE OPCIONAL";
+    document.getElementById("cond_pag").value = cond;
+  }
+
+  function habilitar_campos_submit(){
+    let botoes = document.getElementsByClassName("dado_orc");
+    for(i = 0; i < botoes.length; i++){
+      botoes[i].disabled = false;
+    }
+  }
+
+  function pega_obs_orc(){
+    document.getElementById("obs").value = document.getElementById("obs_orc").value;
+  }
+
+  function pega_conta_deposito(){
+    document.getElementById("conta_deposito").value = document.getElementById("conta_deposito_select").value;
+  }
+
+  function pega_info_adic(){
+    document.getElementById("info_adicionais").value = document.getElementById("info_adic").value;
+  }
+
+  function pega_cond_pag_orc(){
+    document.getElementById("cond_pag").value = document.getElementById("cond_pag_orc").value;
+  }
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Orçamento
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Orçamento de reserva</h1>
+<a href="{% url 'manut_cliente' %}" class="btn btn-outline-info">Consultar/manutenção de clientes</a>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+  <div class="mb-3">
+    <label class="form-label">Nome do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.nome}}" disabled>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Telefone do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.telefone}}" disabled>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Identificação/cidade do cliente: </label>
+    <input type="text" class="form-control"  value="{{cliente.obs}}" disabled>
+  </div>
+</div>
+
+<div class="col-12">
+
+    <form method="post" action="{% url 'gerar_orcamento' cliente.id %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-3">
+            <label for="" class="form-label">Nº de ocupantes</label>
+            <input type="number" class="form-control" id="n_ocupantes" name="n_ocupantes" value="2" min="1">
+          </div>
+
+          <div class="col-sm-9">
+            <label for="" class="form-label">Observação sobre ocupantes</label>
+            <input type="text" class="form-control" id="obs_n_ocupantes" name="obs_n_ocupantes" placeholder="Observação sobre ocupantes">
+          </div>
+          
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-6">
+            <label class="form-label">Selecione a acomodação: </label>
+            <select class="form-select" name="acomodacao">
+              {% for a in acomodacoes %}
+              <option value="{{a.id}}">{{a.nome}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-sm-3">
+            <label for="" class="form-label">Diária cheia?</label>
+            <div class="">
+              <input type="checkbox" class="" id="cheia" name="cheia" onclick="difData()" value="cheia">
+              <label class="btn btn-outline-success" for="cheia">Marque para selecionar diária cheia</label>      
+            </div>
+          </div>
+
+          <div class="col-sm-3">
+            <label class="form-label">Nº de dias: </label>
+            <input class="form-control dado_orc" type="text" id="n_dias" name="n_dias" disabled>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-4">
+            <label class="form-label">Data de entrada: </label>
+            <input type="date" class="form-control" placeholder="Data de entrada" id="entrada" name="entrada" value="{{request.POST.entrada}}" onchange="difData()">
+          </div>
+
+          <div class="col-sm-4">
+            <label class="form-label">Dia da entrada: </label>
+            <input type="text" class="form-control dado_orc" placeholder="Dia da entrada" id="dia_entrada" name="dia_entrada" disabled>
+          </div>
+
+          <div class="col-sm-4">
+            <label class="form-label">Check-in: </label>
+            <select class="form-select" name="checkin">
+              {% for h in horas %}
+              {% if h.checkin %}
+              <option value="{{h.hora}}">{{h.hora}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="row">
+          <div class="col-sm-4">
+            <label class="form-label">Data de saída: </label>
+            <input type="date" class="form-control" placeholder="Data de saída" id="saida" name="saida" value="{{request.POST.saida}}" onchange="difData()">
+          </div>
+
+          <div class="col-sm-4">
+            <label class="form-label">Dia da saída: </label>
+            <input type="text" class="form-control dado_orc" placeholder="Dia da saida" id="dia_saida" name="dia_saida" disabled>
+          </div>
+
+          <div class="col-sm-4">
+            <label class="form-label">Check-out: </label>
+            <select class="form-select" name="checkout">
+              {% for h in horas %}
+              {% if not h.checkin %}
+              <option value="{{h.hora}}">{{h.hora}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Selecione o periodo: </label>
+        <select class="form-select" name="periodo">
+          {% for p in periodos %}
+          <option value="{{p.periodo}}">{{p.periodo}}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+
+      </div>
+      <button type="submit" class="btn btn-primary" onclick="habilitar_campos_submit()">Gravar para informar valores</button>
+      <a class="btn btn-danger" href="{% url 'manut_cliente' %}">Cancelar e retornar</a>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+
+  function difData(){
+    var semana = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
+    if(document.getElementById("cheia").checked){
+      let hoje = new Date()
+      let entrada = new Date(document.getElementById("entrada").value);
+      let saida = new Date(document.getElementById("saida").value);
+      var diaEntrada = semana[(entrada.getDay()+1) % 7];
+      var diaSaida = semana[(saida.getDay()+1) % 7];
+      entrada = entrada.setDate(entrada.getDate()+1);
+      saida = saida.setDate(saida.getDate()+1);
+      console.log(diaEntrada);
+      console.log(diaSaida);
+      if (entrada < hoje || saida < hoje){
+        alert("Atenção! Data selecionada não pode ser anterior a data atual, verifique.");
+      }
+      let dias = (saida-entrada)/(1000*3600*24);
+      dias += 1;
+      dias = dias.toString();
+      if (dias !== "NaN"){
+        document.getElementById("n_dias").value = dias;
+      }
+    } else {
+      let hoje = new Date()
+      let entrada = new Date(document.getElementById("entrada").value);
+      let saida = new Date(document.getElementById("saida").value);
+      var diaEntrada = semana[(entrada.getDay()+1) % 7];
+      var diaSaida = semana[(saida.getDay()+1) % 7];
+      entrada = entrada.setDate(entrada.getDate()+1);
+      saida = saida.setDate(saida.getDate()+1);
+      console.log(diaEntrada);
+      console.log(diaSaida);
+      if (entrada < hoje || saida < hoje){
+        alert("Atenção! Data selecionada não pode ser anterior a data atual, verifique.");
+      }
+      let dias = (saida-entrada)/(1000*3600*24);
+      dias = dias.toString();
+      if (dias !== "NaN"){
+        document.getElementById("n_dias").value = dias;
+      }
+    }
+    if (diaEntrada != undefined){
+      document.getElementById("dia_entrada").value = diaEntrada;
+    }
+    if (diaSaida != undefined){
+      document.getElementById("dia_saida").value = diaSaida;
+    }
+  }
+
+  function habilitar_campos_submit(){
+    let botoes = document.getElementsByClassName("dado_orc");
+    for(i = 0; i < botoes.length; i++){
+      botoes[i].disabled = false;
+    }
+  }
+
+</script>
+
+{% endblock %}
