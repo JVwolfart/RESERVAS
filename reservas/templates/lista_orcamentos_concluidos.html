@@ -35,7 +35,11 @@ Orçamentos concluídos
                 <td class="">{{o.cliente}}</td>
                 <td class="">{{o.acomodacao}}</td>
                 <td><a href="{% url 'vizualizar_pdf' o.id%}" target="_blank" class="btn" title="Visualizar PDF"><i class="fa-regular fa-file-pdf fa-spin-pulse text-primary"></i> Orçamento Nº {{o.id}}</a></td>
+                {% if o.status == "orçamento gerado" %}
                 <td><a href="{% url 'gerar_contrato' o.id%}" class="btn" title="Gerar contrato"><i class="fa-sharp fa-solid fa-file-contract fa-beat fa-2xl" style="color: #00ff11;"></i> Gerar contrato</a></td>
+                {% else %}
+                <td><a href="" class="btn" title="Gerar contrato"><i class="fa-sharp fa-solid fa-file-contract fa-beat fa-2xl" style="color: #00ff11;"></i> Visualizar PDF</a></td>
+                {% endif %}
             </tr>
             {% endfor %}
           </tbody>
