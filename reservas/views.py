@@ -1150,7 +1150,7 @@ def visualizar_pdf_contrato(request, id):
 
 
 
-    info = importante_contrato.capitalize() + "\n\n" + info_adicional_contrato.capitalize()
+    info = importante_contrato + "\n\n" + info_adicional_contrato
 
 
     #descrição da acomodação
