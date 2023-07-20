@@ -8,7 +8,7 @@ Orçamentos concluídos
 
 
 {% block 'conteudo'%}
-<h1 style="padding-top: 20px;" class="text-center text-primary">Lista de orçamentos concluídos</h1>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Lista de todos os orçamentos</h1>
 {% include 'parciais/_messages.html'%}
 
 <div class="col-12">
@@ -22,20 +22,29 @@ Orçamentos concluídos
         <table class="table table-striped table-hover">
           <thead>
             <tr>
-              <th scope="col">Status</th>
               <th scope="col">Cliente</th>
               <th scope="col">Acomodação</th>
-              <th scope="col">Visualizar PDF orçamento</th>
+              <th scope="col">Status</th>
+              <th scope="col"></th>
+              <th scope="col">Ação</th>
             </tr>
           </thead>
           <tbody>
             {% for o in orcamentos %}
             <tr>
-                <td>{{o.status}}</td>
                 <td class="">{{o.cliente}}</td>
                 <td class="">{{o.acomodacao}}</td>
-                <td><a href="{% url 'vizualizar_pdf' o.id%}" target="_blank" class="btn" title="Visualizar PDF"><i class="fa-regular fa-file-pdf fa-spin-pulse text-primary"></i> Orçamento Nº {{o.id}}</a></td>
-                {% if o.status == "orçamento gerado" %}
+                <td>{{o.status}}</td>
+                {% if o.status == "orçamento gerado" or o.status == "contrato gerado" %}
+                <td><a href="{% url 'vizualizar_pdf' o.id%}" target="_blank" class="btn" title="Visualizar PDF"><i class="fa-regular fa-file-pdf fa-2xl text-primary"></i> Visualizar PDF do orçamento</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                {% if o.status == "em digitação" %}
+                <td><a href="{% url 'finalizar_digitacao' o.id%}" class="btn btn-primary" title="Concluir digitação">Concluir digitação</a></td>
+                {% elif o.status == "digitação concluída" %}
+                <td><a href="{% url 'gera_pdf_orc' o.id%}" class="btn btn-secondary" title="Gerar PDF">Gerar PDF do orçamento</a></td>
+                {% elif o.status == "orçamento gerado" %}
                 <td><a href="{% url 'gerar_contrato' o.id%}" class="btn" title="Gerar contrato"><i class="fa-sharp fa-solid fa-file-contract fa-beat fa-2xl" style="color: #00ff11;"></i> Gerar contrato</a></td>
                 {% else %}
                 <td><a href="{% url 'visualizar_pdf_contrato' o.id%}" target="_blank" class="btn" title="Visualizar PDF contrato"><i class="fa-solid fa-file-pdf fa-flip fa-2xl" style="color: #ff0000;"></i> Visualizar PDF contrato</a></td>

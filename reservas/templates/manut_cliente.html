@@ -8,7 +8,11 @@ Clientes
 
 
 {% block 'conteudo'%}
+{% if 'manut_cliente' in request.path %}
 <h1 style="padding-top: 20px;" class="text-center text-primary">Consulta e manutenção de clientes</h1>
+{% else %}
+<h1 style="padding-top: 20px;" class="text-center text-primary">Gera orçamento de reserva</h1>
+{% endif %}
 {% include 'parciais/_messages.html'%}
 
 <div class="col-12">

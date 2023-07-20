@@ -20,10 +20,10 @@
             <img src="{% static 'img/logo1.png'%}" width="100" height="100" class="d-inline-block align-text-middle">
             <span class="fs-1">Sistema de reservas</span>
           </a>
-          <form class="d-flex" action="">
+          <!--<form class="d-flex" action="">
             <input class="form-control me-2" type="search" placeholder="Pesquisa" aria-label="Search" name="termo">
             <button class="btn btn-primary" type="submit">Pesquisa</button>
-          </form>
+          </form>-->
           <div>
             
           </div>
@@ -46,6 +46,104 @@
     
     
     <!--- MENU --->
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel" style="background-color: #198754c1">
+      <div class="offcanvas-header bg-success text-light">
+        <h1 class="offcanvas-title mb-5" id="offcanvasScrollingLabel">Menu</h1>
+        <button type="button" class="btn-close btn-light text-reset text-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <a href="{% url 'home'%}" class="text-light px-5">Home <i class="fa-solid fa-house-chimney text-light fa-xl px-5"></i></a>
+      <div class="offcanvas-body">
+        <div class="row">
+          <div class="accordion accordion-flush" id="accordionFlushExample">
+            <div class="accordion-item bg-success">
+              <h2 class="accordion-header" id="flush-headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                  Cadastros
+                </button>
+              </h2>
+              <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  <ul class="">
+                    <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action">Cadastro de clientes</a>
+                    <a href="{% url 'manut_cliente' %}" class="list-group-item list-group-item-action">Manutenção de clientes</a>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-success">
+              <h2 class="accordion-header" id="flush-headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                  Lançamentos
+                </button>
+              </h2>
+              <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  <ul class="">
+                    <a href="{% url 'gera_orcamento'%}" class="list-group-item list-group-item-action my-3">Gera orçamento de reserva</a>
+                    <a href="{% url 'lista_orcamentos_digitados'%}" class="list-group-item list-group-item-action my-3">Lista orçamentos pendentes</a>
+                    <a href="{% url 'lista_gera_pdf_orcamento'%}" class="list-group-item list-group-item-action my-3">Gerar PDF orçamento</a>
+                    <a href="{% url 'lista_orçamentos_concluidos'%}" class="list-group-item list-group-item-action my-3">Lista orçamentos concluídos/Gera contrato</a>
+                    <a href="{% url 'lista_orçamentos_geral'%}" class="list-group-item list-group-item-action my-3">Lista todos os orçamentos</a>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="accordion-item bg-success">
+              <h2 class="accordion-header" id="flush-headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                  Relatórios
+                </button>
+              </h2>
+              <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  <ul class="">
+                    <a href="" class="list-group-item list-group-item-action my-3">Menu de Relatórios</a>
+                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por dia (tudo)</a>
+                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por tipo (tudo)</a>
+                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por grupo (tudo)</a>
+                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por forma de pagamento (tudo)</a>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-success">
+              <h2 class="accordion-header" id="flush-headingFour">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
+                  Tutorial
+                </button>
+              </h2>
+              <div id="flush-collapseFour" class="accordion-collapse collapse" aria-labelledby="flush-headingFour" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  <ul class="">
+                    <a href="" class="list-group-item list-group-item-action my-3">Tutorial do sistema</a>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item bg-success">
+              <h2 class="accordion-header" id="flush-headingFive">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFive" aria-expanded="false" aria-controls="flush-collapseFive">
+                  Quem somos
+                </button>
+              </h2>
+              <div id="flush-collapseFive" class="accordion-collapse collapse" aria-labelledby="flush-headingFive" data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  <ul class="">
+                    <a href="" class="list-group-item list-group-item-action my-3">Documentação</a>
+                    <a href="" class="list-group-item list-group-item-action my-3">Desenvolvedores</a>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+
+          </div>
+        </div>
+      </div>
+
+    </div>
     
 
       <div class="container">

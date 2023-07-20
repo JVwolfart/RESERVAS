@@ -4,7 +4,8 @@ from . import views
 urlpatterns = [
     path('', views.index, name='home'),
     path('clientes/', views.cadastrar_cliente, name="clientes"),
-    path('manut_cliente', views.manut_clientes, name="manut_cliente"),
+    path('manut_cliente/', views.manut_clientes, name="manut_cliente"),
+    path('gera_orcamento/', views.gera_orcamento, name="gera_orcamento"),
     path('alterar_cliente/<int:id>', views.alterar_cliente, name="alterar_cliente"),
     path('lista_empreendimentos/', views.lista_empreendimentos, name="lista_empreendimentos"),
     path("dados_cliente/<int:id>", views.dados_cliente, name="dados_cliente"),
@@ -17,4 +18,6 @@ urlpatterns = [
     path('lista_orçamentos_concluidos/', views.lista_orçamentos_concluidos, name="lista_orçamentos_concluidos"),
     path('vizualizar_pdf/<int:id>', views.vizualizar_pdf, name="vizualizar_pdf"),
     path('gerar_contrato/<int:id>', views.gerar_contrato, name="gerar_contrato"),
+    path('visualizar_pdf_contrato/<int:id>', views.visualizar_pdf_contrato, name="visualizar_pdf_contrato"),
+    path('lista_orçamentos_geral/', views.lista_orçamentos_geral, name="lista_orçamentos_geral"),
 ]

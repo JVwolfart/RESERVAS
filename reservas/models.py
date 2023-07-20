@@ -8,7 +8,7 @@ class Cliente(models.Model):
     dados_adicionais = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.nome} {self.telefone}"
+        return f"{self.nome} - {self.telefone} - {self.obs}"
     
 class Empreendimento(models.Model):
     nome = models.CharField(max_length=30)
