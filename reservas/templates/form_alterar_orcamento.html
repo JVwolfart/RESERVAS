@@ -2,14 +2,13 @@
 {% load static %}
 
 {% block 'titulo'%}
-Orçamento
+Alterar orçamento
 {% endblock%}
 
 
 
 {% block 'conteudo'%}
-<h1 style="padding-top: 20px;" class="text-center text-primary">Orçamento de reserva</h1>
-<a href="{% url 'manut_cliente' %}" class="btn btn-outline-info">Consultar/manutenção de clientes</a>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alterar orçamento de reserva</h1>
 {% include 'parciais/_messages.html'%}
 
 <div class="col-12">
@@ -42,16 +41,19 @@ Orçamento
     </div>
   </div>
   
+  <form method="post" action="{% url 'alterar_orcamento' orcamento.id%}" enctype="multipart/form-data">
+    {% csrf_token %}
+
   <div class="mb-3">
     <div class="row">
       <div class="col-sm-3">
         <label for="" class="form-label">Nº de ocupantes</label>
-        <input type="number" class="form-control" value="{{orcamento.n_ocupantes}}" disabled>
+        <input type="number" name="n_ocupantes" class="form-control" value="{{orcamento.n_ocupantes}}">
       </div>
 
       <div class="col-sm-9">
         <label for="" class="form-label">Observação sobre ocupantes</label>
-        <input type="text" class="form-control" value="{{orcamento.obs_n_ocupantes}}" disabled>
+        <input type="text" name="obs_n_ocupantes" class="form-control" value="{{orcamento.obs_n_ocupantes}}">
       </div>
       
     </div>
@@ -62,17 +64,28 @@ Orçamento
 
       <div class="col-sm-4">
         <label for="" class="form-label">Tipo de período</label>
-        <input type="text" class="form-control" value="{{orcamento.periodo}}" disabled>
+        <select name="periodo" id="periodo" class="form-select">
+          {% for p in periodos %}
+          {% if p.periodo == orcamento.periodo %}
+          <option value="{{orcamento.periodo}}" selected>{{p.periodo}}</option>
+          {% else %}
+          <option value="{{p.periodo}}">{{p.periodo}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
       </div>
 
       <div class="col-sm-4">
         <label for="" class="form-label">Acomodação</label>
-        <input type="text" class="form-control" value="{{orcamento.acomodacao}}" disabled>
-      </div>
-
-      <div class="col-sm-4">
-        <label for="" class="form-label">Empreendimento</label>
-        <input type="text" class="form-control" value="{{orcamento.acomodacao.empreendimento}}" disabled>
+        <select name="acomodacao" id="acomodacao" class="form-select">
+          {% for a in acomodacoes %}
+          {% if a.nome == orcamento.acomodacao %}
+          <option value="{{orcamento.acomodacao.id}}" selected>{{a.nome}}</option>
+          {% else %}
+          <option value="{{a.id}}">{{a.nome}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
       </div>
     </div>
   </div>
@@ -81,17 +94,25 @@ Orçamento
     <div class="row">
       <div class="col-sm-4">
         <label class="form-label">Data de entrada: </label>
-        <input type="text" class="form-control" value="{{orcamento.data_entrada}}" disabled>
+        <input type="date" class="form-control" id="entrada" name="entrada" value="{{data_entrada}}" onchange="difData()">
       </div>
 
       <div class="col-sm-4">
         <label class="form-label">Dia da entrada: </label>
-        <input type="text" class="form-control" value="{{orcamento.dia_entrada}}" disabled>
+        <input type="text" class="form-control dado_orc" name="dia_entrada" id="dia_entrada" value="{{orcamento.dia_entrada}}" disabled>
       </div>
 
       <div class="col-sm-4">
         <label class="form-label">Check-in: </label>
-        <input type="text" class="form-control" value="{{orcamento.checkin}}" disabled>
+        <select name="checkin" id="checkin" class="form-select">
+          {% for c in checkin %}
+          {% if c.hora == orcamento.checkin %}
+          <option value="{{orcamento.checkin}}" selected>{{c.hora}}</option>
+          {% else %}
+          <option value="{{c.hora}}">{{c.hora}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
       </div>
     </div>
   </div>
@@ -100,17 +121,25 @@ Orçamento
     <div class="row">
       <div class="col-sm-4">
         <label class="form-label">Data de saída: </label>
-        <input type="text" class="form-control" value="{{orcamento.data_saida}}" disabled>
+        <input type="date" class="form-control" name="saida" id="saida" value="{{data_saida}}" onchange="difData()">
       </div>
 
       <div class="col-sm-4">
         <label class="form-label">Dia da saída: </label>
-        <input type="text" class="form-control" value="{{orcamento.dia_saida}}" disabled>
+        <input type="text" class="form-control dado_orc" name="dia_saida" id="dia_saida" value="{{orcamento.dia_saida}}" disabled>
       </div>
 
       <div class="col-sm-4">
         <label class="form-label">Check-out: </label>
-        <input type="text" class="form-control" value="{{orcamento.checkout}}" disabled>
+        <select name="checkout" id="checkout" class="form-select">
+          {% for c in checkout %}
+          {% if c.hora == orcamento.checkout %}
+          <option value="{{orcamento.checkout}}" selected>{{c.hora}}</option>
+          {% else %}
+          <option value="{{c.hora}}">{{c.hora}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
       </div>
     </div>
   </div>
@@ -119,16 +148,19 @@ Orçamento
     <div class="row">
       <div class="col-sm-3">
         <label class="form-label">Total de diárias da reserva: </label>
-        <input type="text" class="form-control" value="{{orcamento.n_dias}}" id="n_dias" disabled>
+        <input type="text" class="form-control dado_orc" value="{{orcamento.n_dias}}" id="n_dias" name="n_dias" disabled>
       </div>
 
       <div class="col-sm-3">
         <label class="form-label">Diária cheia ou pernoite?</label>
-        {% if orcamento.diaria_cheia %}
-          <input type="text" class="form-control" value="Diária cheia" disabled>
-        {% else %}
-          <input type="text" class="form-control" value="Diária Pernoite" disabled>
-        {% endif %}
+        <div class="">
+            {% if orcamento.diaria_cheia %}
+            <input type="checkbox" class="" id="cheia" name="cheia" onclick="difData()" value="cheia" checked>
+            {% else %}
+            <input type="checkbox" class="" id="cheia" name="cheia" onclick="difData()" value="cheia">
+            {% endif %}
+            <label class="btn btn-outline-success" for="cheia">Marque para selecionar diária cheia</label>      
+        </div>
       </div>
     </div>
   </div>
@@ -139,8 +171,7 @@ Orçamento
 
 <div class="col-12">
 
-    <form method="post" action="{% url 'finalizar_digitacao' orcamento.id %}" enctype="multipart/form-data">
-      {% csrf_token %}
+    
 
       <div class="mb-3">
         <div class="row">
@@ -151,17 +182,17 @@ Orçamento
 
           <div class="col-sm-3">
             <label for="" class="form-label">Taxa de limpeza</label>
-            <input type="number" class="form-control" id="taxa_limpeza" name="taxa_limpeza" value="0" min="0" step="0.01">
+            <input type="number" class="form-control" id="taxa_limpeza" name="taxa_limpeza" value="{{taxa_limpeza}}" min="0" step="0.01">
           </div>
 
           <div class="col-sm-3">
             <label for="" class="form-label">Descontos</label>
-            <input type="number" class="form-control" id="descontos" name="descontos" value="0" min="0" step="0.01">
+            <input type="number" class="form-control" id="descontos" name="descontos" value="{{descontos}}" min="0" step="0.01">
           </div>
 
           <div class="col-sm-3">
             <label for="" class="form-label">Acréscimos</label>
-            <input type="number" class="form-control" id="acrescimos" name="acrescimos" value="0" min="0" step="0.01">
+            <input type="number" class="form-control" id="acrescimos" name="acrescimos" value="{{acrescimos}}" min="0" step="0.01">
           </div>
           
         </div>
@@ -170,12 +201,12 @@ Orçamento
         <div class="row">
           <div class="col-sm-3">
             <label for="" class="form-label">Valor pacote</label>
-            <input type="number" class="form-control" id="valor_pacote" name="valor_pacote" value="0" min="0" step="0.01">
+            <input type="number" class="form-control" id="valor_pacote" name="valor_pacote" value="{{valor_pacote}}" min="0" step="0.01">
           </div>
 
           <div class="col-sm-3">
             <label for="" class="form-label">Quantidade de dias do pacote</label>
-            <input type="number" class="form-control" id="dias_pacote" name="dias_pacote" value="0" min="0" step="1">  
+            <input type="number" class="form-control" id="dias_pacote" name="dias_pacote" value="{{dias_pacote}}" min="0" step="1">  
           </div>
 
           <div class="col-sm-3">
@@ -268,7 +299,7 @@ Orçamento
             {% endfor %}
           </select>
           <label for="" class="form-label">Condições de pagamento</label>
-          <textarea class="form-control" name="cond_pag" id="cond_pag" cols="30" rows="10"></textarea>
+          <textarea class="form-control" name="cond_pag" id="cond_pag" cols="30" rows="10">{{obs_orcamento.condicoes_pagamento}}</textarea>
         </div>
 
       </div>
@@ -281,7 +312,7 @@ Orçamento
             {% endfor %}
           </select>
           <label for="" class="form-label">Observações</label>
-          <textarea class="form-control" name="obs" id="obs" cols="30" rows="5"></textarea>
+          <textarea class="form-control" name="obs" id="obs" cols="30" rows="5">{{obs_orcamento.obs}}</textarea>
         </div>
 
         <div class="col-12">
@@ -292,15 +323,18 @@ Orçamento
             {% endfor %}
           </select>
           <label for="" class="form-label">Informações adicionais</label>
-          <textarea class="form-control" name="info_adicionais" id="info_adicionais" cols="30" rows="15"></textarea>
+          <textarea class="form-control" name="info_adicionais" id="info_adicionais" cols="30" rows="15">{{obs_orcamento.informacoes_adicionais}}</textarea>
         </div>
 
 
       <div class="mb-3">
-
+        <div class="col-12">
+          <label for="" class="form-label">Informe o motivo da alteração desse orçamento</label>
+          <input type="text" class="form-control text-danger" id="motivo" name="motivo" maxlength="200" required>
+        </div>
       </div>
       <button type="submit" class="btn btn-primary" onclick="habilitar_campos_submit()">Finalizar orçamento</button>
-      <a class="btn btn-danger" href="{% url 'lista_orcamentos_digitados' %}">Cancelar e retornar</a>
+      <a class="btn btn-danger" href="{% url 'lista_alterar_orcamento' %}">Cancelar e retornar</a>
     </form>
 
     <div class="row">
@@ -316,6 +350,64 @@ Orçamento
 <script type="text/javascript">
 
   $("#tot_diarias").mask("R$ 0.000,00");
+
+  function difData(){
+    var semana = ["Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira", "Quinta-Feira", "Sexta-Feira", "Sábado"];
+    if(document.getElementById("cheia").checked){
+      let hoje = new Date()
+      let entrada = new Date(document.getElementById("entrada").value);
+      let saida = new Date(document.getElementById("saida").value);
+      var diaEntrada = semana[(entrada.getDay()+1) % 7];
+      var diaSaida = semana[(saida.getDay()+1) % 7];
+      entrada = entrada.setDate(entrada.getDate()+1);
+      saida = saida.setDate(saida.getDate()+1);
+      console.log(diaEntrada);
+      console.log(diaSaida);
+      if (entrada < hoje || saida < hoje){
+        alert("Atenção! Data selecionada não pode ser anterior a data atual, verifique.");
+      }
+      let dias = (saida-entrada)/(1000*3600*24);
+      dias += 1;
+      dias = dias.toString();
+      if (dias !== "NaN"){
+        document.getElementById("n_dias").value = dias;
+      }
+    } else {
+      let hoje = new Date()
+      let entrada = new Date(document.getElementById("entrada").value);
+      let saida = new Date(document.getElementById("saida").value);
+      var diaEntrada = semana[(entrada.getDay()+1) % 7];
+      var diaSaida = semana[(saida.getDay()+1) % 7];
+      entrada = entrada.setDate(entrada.getDate()+1);
+      saida = saida.setDate(saida.getDate()+1);
+      console.log(diaEntrada);
+      console.log(diaSaida);
+      if (entrada < hoje || saida < hoje){
+        alert("Atenção! Data selecionada não pode ser anterior a data atual, verifique.");
+      }
+      let dias = (saida-entrada)/(1000*3600*24);
+      dias = dias.toString();
+      if (dias !== "NaN"){
+        document.getElementById("n_dias").value = dias;
+      }
+    }
+    if (diaEntrada != undefined){
+      document.getElementById("dia_entrada").value = diaEntrada;
+    }
+    if (diaSaida != undefined){
+      document.getElementById("dia_saida").value = diaSaida;
+    }
+  }
+
+  function habilitar_campos_submit(){
+    let motivo = document.getElementById("motivo").value
+    if (motivo !== ""){
+      let botoes = document.getElementsByClassName("dado_orc");
+      for(i = 0; i < botoes.length; i++){
+        botoes[i].disabled = false;
+      }
+    }
+  }
 
   function calcular_orcamento(){
     var diaria = parseFloat(document.getElementById("valor_diaria").value);
@@ -342,13 +434,6 @@ Orçamento
     var saldo = total_geral-metade;
     var cond = "CONDIÇÃO DE PAGAMENTO PADRÃO:" + "\n\n- DEPÓSITO A VISTA PIX PARA A CONFIRMAÇÃO DA RESERVA R$ " + metade.toFixed(2) + "\n- VALOR A SER PAGO NA CHEGADA AO RESIDENCIAL = R$ " + saldo.toFixed(2) + " + OCUPANTES ADICIONAIS FORA OS CONTRATADOS NA RESERVA (SE HOUVER)" + "\n\nVALOR A SER PAGO NA SAÍDA : CUSTO DO AR CONDICIONADO SE OPTAR POR ESTE OPCIONAL";
     document.getElementById("cond_pag").value = cond;
-  }
-
-  function habilitar_campos_submit(){
-    let botoes = document.getElementsByClassName("dado_orc");
-    for(i = 0; i < botoes.length; i++){
-      botoes[i].disabled = false;
-    }
   }
 
   function pega_obs_orc(){

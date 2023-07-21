@@ -64,8 +64,8 @@
               <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body">
                   <ul class="">
-                    <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action">Cadastro de clientes</a>
-                    <a href="{% url 'manut_cliente' %}" class="list-group-item list-group-item-action">Manutenção de clientes</a>
+                    <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action my-3">Cadastro de clientes</a>
+                    <a href="{% url 'manut_cliente' %}" class="list-group-item list-group-item-action my-3">Manutenção de clientes</a>
                   </ul>
                 </div>
               </div>
@@ -91,17 +91,15 @@
             <div class="accordion-item bg-success">
               <h2 class="accordion-header" id="flush-headingThree">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                  Relatórios
+                  Manutenção dos registros
                 </button>
               </h2>
               <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body">
                   <ul class="">
-                    <a href="" class="list-group-item list-group-item-action my-3">Menu de Relatórios</a>
-                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por dia (tudo)</a>
-                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por tipo (tudo)</a>
-                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por grupo (tudo)</a>
-                    <a href="" class="list-group-item list-group-item-action my-3">Despesas por forma de pagamento (tudo)</a>
+                    <a href="{% url 'lista_alterar_orcamento'%}" class="list-group-item list-group-item-action my-3">Alterar orçamento digitado</a>
+                    <a href="{% url 'lista_eliminar_orcamento'%}" class="list-group-item list-group-item-action my-3">Eliminar orçamento</a>
+                    <a href="{% url 'lista_eliminar_contrato'%}" class="list-group-item list-group-item-action my-3">Eliminar contrato</a>
                   </ul>
                 </div>
               </div>

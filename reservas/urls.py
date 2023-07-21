@@ -20,4 +20,10 @@ urlpatterns = [
     path('gerar_contrato/<int:id>', views.gerar_contrato, name="gerar_contrato"),
     path('visualizar_pdf_contrato/<int:id>', views.visualizar_pdf_contrato, name="visualizar_pdf_contrato"),
     path('lista_orçamentos_geral/', views.lista_orçamentos_geral, name="lista_orçamentos_geral"),
+    path('lista_eliminar_orcamento/', views.lista_eliminar_orcamento, name="lista_eliminar_orcamento"),
+    path('eliminar_orcamento/<int:id>', views.eliminar_orcamento, name="eliminar_orcamento"),
+    path('lista_eliminar_contrato/', views.lista_eliminar_contrato, name="lista_eliminar_contrato"),
+    path('eliminar_contrato/<int:id>', views.eliminar_contrato, name="eliminar_contrato"),
+    path('lista_alterar_orcamento/', views.lista_alterar_orcamento, name="lista_alterar_orcamento"),
+    path('alterar_orcamento/<int:id>', views.alterar_orcamento, name="alterar_orcamento"),
 ]
