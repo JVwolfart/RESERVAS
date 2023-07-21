@@ -1414,7 +1414,7 @@ def visualizar_pdf_contrato(request, id):
 
     from reportlab.lib.styles import ParagraphStyle
 
-    estilo_obs = ParagraphStyle('Body', fontName=bold1, fontSize=8, leading=9, spaceBefore=20, textColor="black",backColor="#f1f1f1")
+    estilo_obs = ParagraphStyle('Body', fontName=bold1, fontSize=10, leading=12, spaceBefore=20, textColor="black",backColor="#f1f1f1")
 
     obs = dados_banco.replace("\n","<BR/>")
     p = Paragraph(obs,estilo_obs)

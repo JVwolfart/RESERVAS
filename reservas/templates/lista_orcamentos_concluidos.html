@@ -57,7 +57,7 @@ Orçamentos concluídos
       {%for pagina in orcamentos.paginator.page_range%}
       {%if orcamentos.number == pagina%}
         <li class="page-item active"><a class="page-link bg-success" href="?p={{pagina}}&termo_cliente={{termo_cliente}}">{{pagina}}</a></li>
-      {% elif clientes.number > pagina|add:'-3'  and clientes.number < pagina|add:'3'%}
+      {% elif orcamentos.number > pagina|add:'-3'  and orcamentos.number < pagina|add:'3'%}
         <li class="page-item"><a class="page-link" href="?p={{pagina}}&termo_cliente={{termo_cliente}}">{{pagina}}</a></li>
       {%endif%}
       {%endfor%}
