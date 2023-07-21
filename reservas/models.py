@@ -118,6 +118,7 @@ class ObsOrcamento(models.Model):
     
 class Contrato(models.Model):
     orcamento = models.ForeignKey(Orcamento, on_delete=models.CASCADE)
+    data_contrato = models.DateField(default=timezone.now)
     aviso_contrato = models.TextField(blank=True, null=True)
     info_adic_contrato = models.TextField(blank=True, null=True)
     conta_deposito = models.TextField(blank=True, null=True)

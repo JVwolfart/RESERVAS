@@ -703,6 +703,7 @@ def vizualizar_pdf(request, id):
     buffer = io.BytesIO()
 
     ### variáveis do projeto
+    data_orçamento = f"{datetime.strftime(orc.data_orcamento, '%d de %b de %Y')}"
     n_orçamento=f"{orc.id}"
     hospede = f"{orc.cliente}"
     empreendimento= f"{orc.acomodacao.empreendimento}"
@@ -797,6 +798,13 @@ def vizualizar_pdf(request, id):
     cnv.setFillColor('black')
     cnv.setFont(padr,13)
     cnv.drawRightString(570,713, n_orçamento)
+    cnv.setFillColor('black')
+    cnv.setFillColor('blue')
+    cnv.setFont(padr_bold,10)
+    cnv.drawString(110,713,"DATA DO ORÇAMENTO: ")
+    cnv.setFillColor('black')
+    cnv.setFont(padr,13)
+    cnv.drawString(230,713, data_orçamento)
     cnv.setFillColor('black')
 
 
@@ -1110,6 +1118,9 @@ def visualizar_pdf_contrato(request, id):
     #ZapfDingbats
 
     ### variáveis do projeto
+    
+    data_contrato = f"{datetime.strftime(obs_contrato.data_contrato, '%d de %b de %Y')}"
+    print (data_contrato)
     n_orçamento=f"{orc.id}"
     hospede = f"{orc.cliente}"
     empreendimento= f"{orc.acomodacao.empreendimento}"
@@ -1195,6 +1206,14 @@ def visualizar_pdf_contrato(request, id):
     cnv.setFillColor('black')
     cnv.setFont(padr,13)
     cnv.drawRightString(570,713, n_orçamento)
+    cnv.setFillColor('black')
+    
+    cnv.setFillColor('blue')
+    cnv.setFont(padr_bold,10)
+    cnv.drawString(110,713,"DATA DO CONTRATO: ")
+    cnv.setFillColor('black')
+    cnv.setFont(padr,13)
+    cnv.drawString(225,713, data_contrato)
     cnv.setFillColor('black')
 
 
