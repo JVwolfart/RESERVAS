@@ -33,15 +33,21 @@ Eliminar contratos
           <tbody>
             {% for o in orcamentos %}
             <tr>
+                {% if not o.eliminado %}
                 <td class="">{{o.id}}</td>
                 <td class="">{{o.cliente}}</td>
                 <td class="">{{o.acomodacao}}</td>
                 <td>{{o.status}}</td>
-                {% if not o.eliminado %}
+                
                 <td>Não</td>
                 <td><a href="{% url 'eliminar_contrato' o.id%}" class="btn btn-danger" title="Eliminar orçamento">Eliminar contrato</a></td>
                 {% else %}
-                <td>Sim</td>
+                <td class="text-danger">{{o.id}}</td>
+                <td class="text-danger">{{o.cliente}}</td>
+                <td class="text-danger">{{o.acomodacao}}</td>
+                <td class="text-danger">{{o.status}}</td>
+
+                <td class="text-danger">Sim</td>
                 <td><a href="{% url 'eliminar_contrato' o.id%}" class="btn btn-success" title="Reativar orçamento">Reativar contrato eliminado</a></td>
                 {% endif %}
             </tr>
