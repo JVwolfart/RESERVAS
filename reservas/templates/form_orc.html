@@ -52,7 +52,8 @@ Orçamento
         <div class="row">
           <div class="col-sm-6">
             <label class="form-label">Selecione a acomodação: </label>
-            <select class="form-select" name="acomodacao">
+            <select class="form-select text-danger" name="acomodacao">
+              <option value="" selected class="text-danger">---selecione uma acomodação---</option>
               {% for a in acomodacoes %}
               <option value="{{a.id}}">{{a.nome}}</option>
               {% endfor %}
@@ -88,7 +89,8 @@ Orçamento
 
           <div class="col-sm-4">
             <label class="form-label">Check-in: </label>
-            <select class="form-select" name="checkin">
+            <select class="form-select text-danger" name="checkin">
+              <option value="" selected>--selecione um horário de checkin--</option>
               {% for h in horas %}
               {% if h.checkin %}
               <option value="{{h.hora}}">{{h.hora}}</option>
@@ -113,7 +115,8 @@ Orçamento
 
           <div class="col-sm-4">
             <label class="form-label">Check-out: </label>
-            <select class="form-select" name="checkout">
+            <select class="form-select text-danger" name="checkout">
+              <option value="" selected>--selecione um horário de checkout--</option>
               {% for h in horas %}
               {% if not h.checkin %}
               <option value="{{h.hora}}">{{h.hora}}</option>
@@ -126,7 +129,8 @@ Orçamento
 
       <div class="mb-3">
         <label class="form-label">Selecione o periodo: </label>
-        <select class="form-select" name="periodo">
+        <select class="form-select text-danger" name="periodo">
+          <option value="" selected>---selecione um período---</option>
           {% for p in periodos %}
           <option value="{{p.periodo}}">{{p.periodo}}</option>
           {% endfor %}
