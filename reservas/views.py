@@ -245,7 +245,7 @@ def gerar_orcamento(request, id):
 def lista_orcamentos_digitados(request):
     orcamentos = Orcamento.objects.all().filter(
         status="em digitação"
-    )
+    ).exclude(eliminado=True)
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, "Não existem orçamentos pendentes em digitação")
     return render(request, "orc_em_digitacao.html", {"orcamentos": orcamentos})
@@ -314,7 +314,7 @@ def finalizar_digitacao(request, id):
 def lista_gera_pdf_orcamento(request):
     orcamentos = Orcamento.objects.all().filter(
         status="digitação concluída"
-    )
+    ).exclude(eliminado=True)
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, "Todos os orçamentos pendentes já tiveram seu PDF gerado. Dúvidas, consulte a lista de orçamentos concluídos")
     return render(request, "orc_digitados.html", {"orcamentos": orcamentos})
@@ -697,11 +697,11 @@ def lista_orçamentos_concluidos(request):
         termo_cliente = termo_cliente.strip()
         orcamentos = Orcamento.objects.all().filter(
             Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), Q(status="orçamento gerado") | Q(status="contrato gerado")
-        ).order_by("-id")
+        ).exclude(eliminado=True).order_by("-id")
     else:
         orcamentos = Orcamento.objects.all().filter(
             Q(status="orçamento gerado") | Q(status="contrato gerado")
-        ).order_by("-id")
+        ).exclude(eliminado=True).order_by("-id")
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
@@ -1096,7 +1096,7 @@ def gerar_contrato(request, id):
     contas_deposito = Observacao.objects.all().filter(
         tipo__tipo="Contas para depósito"
     )
-    print(total_diarias)
+    #print(total_diarias)
     if request.method != "POST":
         return render(request, "form_contrato.html", {"orcamento": orcamento, "total_diarias": total_diarias, "cond_pag": cond_pag, "info_adic_contrato": info_adic_contrato, "aviso_contrato":aviso_contrato, "cond_pag_contrato": cond_pag_contrato, "contas_deposito":contas_deposito})
     else:
