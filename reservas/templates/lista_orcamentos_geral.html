@@ -45,7 +45,7 @@ Orçamentos concluídos
                 {% if o.status == "em digitação" %}
                 <td><a href="{% url 'finalizar_digitacao' o.id%}" class="btn btn-primary" title="Concluir digitação">Concluir digitação</a></td>
                 {% elif o.status == "digitação concluída" %}
-                <td><a href="{% url 'gera_pdf_orc' o.id%}" class="btn btn-secondary" title="Gerar PDF">Gerar PDF do orçamento</a></td>
+                <td><a href="{% url 'gera_pdf_orc' o.id%}" target="_blank" class="btn btn-secondary" title="Gerar PDF">Gerar PDF do orçamento</a></td>
                 {% elif o.status == "orçamento gerado" %}
                 <td><a href="{% url 'gerar_contrato' o.id%}" class="btn" title="Gerar contrato"><i class="fa-sharp fa-solid fa-file-contract fa-beat fa-2xl" style="color: #00ff11;"></i> Gerar contrato</a></td>
                 {% else %}
