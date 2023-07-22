@@ -1140,7 +1140,7 @@ def visualizar_pdf_contrato(request, id):
     ### variáveis do projeto
     
     data_contrato = f"{datetime.strftime(obs_contrato.data_contrato, '%d de %b de %Y')}"
-    print (data_contrato)
+    #print (data_contrato)
     n_orçamento=f"{orc.id}"
     hospede = f"{orc.cliente}"
     empreendimento= f"{orc.acomodacao.empreendimento}"
