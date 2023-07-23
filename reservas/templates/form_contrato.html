@@ -8,6 +8,14 @@ Contrato de reserva de temporada
 
 
 {% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_orçamentos_geral'%}">Lista todos os Orçamentos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Gerar Contrato</li>
+  </ol>
+</nav>
+
 <h1 style="padding-top: 20px;" class="text-center text-primary">Contrato de reserva de temporada</h1>
 <a href="{% url 'lista_orçamentos_concluidos' %}" class="btn btn-outline-info">Volta para orçamentos concluídos</a>
 {% include 'parciais/_messages.html'%}

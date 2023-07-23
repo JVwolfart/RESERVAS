@@ -6,41 +6,77 @@ Home
 {% endblock%}
 
 {% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+      
+    </ol>
+  </nav>
+
 <h1 style="padding-top: 20px;" class="text-center text-primary">Sistema de reservas</h1>
 {% include 'parciais/_messages.html'%}
 
 <div class="row">
     <div class="row py-5">
     
-        <div class="col-md-3 col-6 mb-5">
+        <div class="col-md-4 col-6 mb-5">
     
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
-                <a href="{% url 'clientes'%}">
-                    <img src="{% static 'img/icone_clientes.jpg'%}" style="width:150px; height: 150px;">
+                <a href="{% url 'clientes'%}" style="text-decoration:none">
+                    <img src="{% static 'img/icone_clientes.png'%}" style="width:150px; height: 150px;">
                     <br>
                     Cadastro prévio de clientes
                 </a>
             </div>
         </div>
-        <div class="col-md-3 col-6 mb-5">
+        <div class="col-md-4 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
-                <a href="{% url 'lista_empreendimentos'%}">
-                    <img src="{% static 'img/icone_empreendimentos.png'%}" style="width:150px; height: 150px;">
+                <a href="{% url 'gera_orcamento'%}"style="text-decoration:none">
+                    <img src="{% static 'img/gerar_orcamento.png'%}" style="width:150px; height: 150px;">
                     <br>
-                    Lista de empreendimentos
+                    Gerar Orçamento de reserva
                 </a>
             </div>
         </div>
-        <div class="col-md-3 col-6 mb-5">
+        <div class="col-md-4 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
-                <a href="{% url 'lista_orçamentos_concluidos'%}">
-                    <img src="{% static 'img/icone_acomodacoes.png'%}" style="width:150px; height: 150px;">
+                <a href="{% url 'lista_orçamentos_geral'%}"style="text-decoration:none">
+                    <img src="{% static 'img/listar_orcamentos.png'%}" style="width:150px; height: 150px;">
                     <br>
-                    Lista orçamentos concluídos
+                    Lista Todos os Orçamentos
+                </a>
+            </div>
+        </div>
+        <div class="col-md-4 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_alterar_orcamento'%}"style="text-decoration:none">
+                    <img src="{% static 'img/alterar_orcamento.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Alterar orçamento digitado
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_eliminar_orcamento'%}"style="text-decoration:none">
+                    <img src="{% static 'img/eliminar_orcamento.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Eliminar orçamento
                 </a>
             </div>
         </div>
         
+        <div class="col-md-4 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_eliminar_contrato'%}"style="text-decoration:none">
+                    <img src="{% static 'img/eliminar_contrato.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Eliminar Contrato
+                </a>
+            </div>
+        </div>
+
     </div>
     
 </div>

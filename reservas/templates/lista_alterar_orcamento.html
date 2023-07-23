@@ -8,6 +8,13 @@ Alterar orçamentos
 
 
 {% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item active" aria-current="page">lista alterar Orçamento</li>
+  </ol>
+</nav>
+
 <h1 style="padding-top: 20px;" class="text-center text-primary">Alterar orçamentos</h1>
 {% include 'parciais/_messages.html'%}
 

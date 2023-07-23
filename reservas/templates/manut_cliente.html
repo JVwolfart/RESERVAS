@@ -8,6 +8,18 @@ Clientes
 
 
 {% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    {% if 'manut_cliente' in request.path %}
+    <li class="breadcrumb-item"><a href="{% url 'clientes'%}">Cadastro prévio de Clientes</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Manutenção Clientes</li>
+    {% else %}
+    <li class="breadcrumb-item active" aria-current="page">Gerar Orçamento de Reserva</li>
+    {% endif %}
+  </ol>
+</nav>
+
 <div class="row">
 <div class="col-sm-8">
   {% if 'manut_cliente' in request.path %}
@@ -48,7 +60,7 @@ Clientes
                 <td>{{c.nome}}</td>
                 <td class="">{{c.telefone}}</td>
                 <td class="">{{c.obs}}</td>
-                <td><a href="{% url 'alterar_cliente' c.id%}" class="btn" title="Alterar cliente"><i class="fa-solid fa-pen-to-square text-primary"></i> Editar</a></td>
+                <td><a href="{% url 'alterar_cliente' c.id%}" class="btn" title="Alterar cliente"><i class="fa-solid fa-pen-to-square text-primary"></i> Editar Fone/Obs</a></td>
                 {% if c.dados_adicionais %}
                 <td><a href="{% url 'alterar_dados_cliente' c.id%}" class="btn btn-warning">Alterar dados</a></td>
                 {% else %}
