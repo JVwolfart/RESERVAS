@@ -8,14 +8,22 @@ Clientes
 
 
 {% block 'conteudo'%}
-{% if 'manut_cliente' in request.path %}
+<div class="row">
+<div class="col-sm-8">
+  {% if 'manut_cliente' in request.path %}
 <h1 style="padding-top: 20px;" class="text-center text-primary">Consulta e manutenção de clientes</h1>
 {% else %}
 <h1 style="padding-top: 20px;" class="text-center text-primary">Gera orçamento de reserva</h1>
 {% endif %}
 {% include 'parciais/_messages.html'%}
+</div>
+<div class="col-sm-4">
+  <a href="{% url 'clientes' %}" class="btn btn-outline-success" style="margin-top: 20px;">+ Adicionar Novo Cliente</a>
+</div>
 
-<div class="col-12">
+</div>
+
+<div class="col-12 mt-5">
 
     <form class="d-flex" action="">
         <input class="form-control me-2" type="search" placeholder="Pesquisa" aria-label="Search" name="termo_cliente">

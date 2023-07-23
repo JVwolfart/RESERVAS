@@ -44,7 +44,7 @@ def cadastrar_cliente(request):
         novo_cliente = Cliente.objects.create(nome=nome, telefone=celular, obs=obs)
         novo_cliente.save()
         messages.add_message(request, messages.SUCCESS, f'Cliente {novo_cliente} cadastrado com sucesso')
-        return redirect("home")
+        return redirect("manut_cliente")
 
 @login_required(login_url="login")
 def manut_clientes(request):
@@ -53,9 +53,9 @@ def manut_clientes(request):
         termo_cliente = termo_cliente.strip()
         clientes = Cliente.objects.all().filter(
             Q(nome__icontains=termo_cliente) | Q(telefone__icontains=termo_cliente) | Q(obs__icontains=termo_cliente)
-        )
+        ).order_by("nome")
     else:
-        clientes = Cliente.objects.all()
+        clientes = Cliente.objects.all().order_by("nome")
     if len(clientes) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum cliente encontrado com o termo {termo_cliente}")
     paginator = Paginator(clientes, 10)
@@ -71,9 +71,9 @@ def gera_orcamento(request):
         termo_cliente = termo_cliente.strip()
         clientes = Cliente.objects.all().filter(
             Q(nome__icontains=termo_cliente) | Q(telefone__icontains=termo_cliente) | Q(obs__icontains=termo_cliente)
-        )
+        ).order_by("nome")
     else:
-        clientes = Cliente.objects.all()
+        clientes = Cliente.objects.all().order_by("nome")
     if len(clientes) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum cliente encontrado com o termo {termo_cliente}")
     paginator = Paginator(clientes, 10)
