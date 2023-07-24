@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.core.validators import  validate_email
+from django.contrib.auth.decorators import login_required
 
 def login(request):
     if request.method != 'POST':
@@ -30,11 +31,7 @@ def login(request):
 
 def cadastro(request):
     if request.method != 'POST':
-        user = request.user
-        if user.is_authenticated:
-            return redirect('home')
-        else:
-            return render(request, 'cadastro.html')
+        return render(request, 'cadastro.html')
     nome = request.POST.get('nome').strip().title()
     sobrenome = request.POST.get('sobrenome').strip().title()
     email = request.POST.get('email').strip()
@@ -91,3 +88,8 @@ def logout(request):
     auth.logout(request)
     messages.add_message(request, messages.SUCCESS, 'Logout feito com sucesso')
     return redirect('login')
+
+@login_required(login_url="login")
+def lista_usuarios(request):
+    usuarios = User.objects.all()
+    return render(request, "lista_usuarios.html", {"usuarios": usuarios})

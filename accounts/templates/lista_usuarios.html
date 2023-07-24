@@ -1,0 +1,65 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Usuários
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Lista de usuários Cadastrados</li>
+  </ol>
+</nav>
+
+<div class="row">
+  <div class="col-sm-8">
+  <h1 style="padding-top: 20px;" class="text-center text-primary">Lista de usuários cadastrados</h1>
+  </div>
+  <div class="col-sm-4">
+    <a href="{% url 'cadastro'%}" class="btn btn-outline-success" style="margin-top: 20px;">+ Adicionar Novo usuário</a>
+  </div>
+  
+  </div>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <div class="col-12 table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Usuário</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Sobrenome</th>
+              <th scope="col">E-mail</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in usuarios %}
+            <tr>
+                <td>{{c.username}}</td>
+                <td>{{c.first_name}}</td>
+                <td>{{c.last_name}}</td>
+                <td>{{c.email}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+</div>
+</div>
+
+
+<div class="row">
+    <div style="height: 400px; text-align: center;">
+      <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+{% endblock %}

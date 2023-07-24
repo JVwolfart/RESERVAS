@@ -1,0 +1,132 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Alteração de acomodações
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_acomodacoes'%}">Lista de acomodações cadastradas</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Alteração de acomodações</li>
+  </ol>
+</nav>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alteração de acomodações</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Nome da acomodação: </label>
+        <input type="text" class="form-control" name="nome" placeholder="Nome da acomodação" value="{{acomodacao.nome}}" maxlength="50">
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Empreendimento: </label>
+            <select class="form-select text-danger" name="empreendimento">
+              {% for e in empreendimentos %}
+              {% if e.nome == acomodacao.empreendimento.nome %}
+              <option value="{{acomodacao.empreendimento.id}}" selected>{{acomodacao.empreendimento.nome}}</option>
+              {% else %}
+              <option value="{{e.id}}">{{e.nome}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Tipo de acomodação: </label>
+            <select class="form-select text-danger" name="tipo">
+              {% for t in tipos %}
+              {% if acomodacao.tipo == t %}
+              <option value="{{t}}" selected class="text-danger">{{t}}</option>
+              {% else %}
+              <option value="{{t}}" class="text-danger">{{t}}</option>
+              {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Nº de quartos: </label>
+            <input type="number" class="form-control" name="quartos" placeholder="Nº de quartos" value="{{acomodacao.quartos}}">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Valor base: </label>
+            <input type="number" class="form-control" name="valor_base" placeholder="Valor base" value="{{valor}}" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Limite ideal de ocupantes: </label>
+            <input type="number" class="form-control" name="limite_ideal" placeholder="Limite ideal de ocupantes" value="{{acomodacao.limite_ideal}}">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Limite adicional de ocupantes permitido: </label>
+            <input type="number" class="form-control" name="limite_adicional" placeholder="Limite adicional de ocupantes permitido" value="{{acomodacao.limite_adicional}}">
+          </div>
+        </div>
+      </div>
+
+      
+
+      
+
+      
+
+      
+
+      <div class="mb-3">
+        <label for="" class="form-label">Aceita pet?</label>
+        <div class="">
+          {% if acomodacao.aceita_pet %}
+          <input type="checkbox" class="" id="pet" name="pet" value="pet" checked>
+          {% else %}
+          <input type="checkbox" class="" id="pet" name="pet" value="pet">
+          {% endif %}
+          <label class="btn btn-outline-success" for="pet">Marque se aceitar pet</label>      
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descrição da acomodação: </label>
+        <textarea name="descricao" id="descricao" cols="30" rows="15" class="form-control">{{acomodacao.descricao}}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Confirmar alterações</button>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

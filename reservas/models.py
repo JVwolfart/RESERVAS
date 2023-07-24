@@ -32,7 +32,7 @@ class Observacao(models.Model):
         return f"{self.identificacao}"
 
 class Acomodacao(models.Model):
-    nome = models.CharField(max_length=30)
+    nome = models.CharField(max_length=50)
     empreendimento = models.ForeignKey(Empreendimento, on_delete=models.DO_NOTHING)
     tipo = models.CharField(max_length=15)
     quartos = models.IntegerField(blank=True, null=True)

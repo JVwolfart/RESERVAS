@@ -1,0 +1,127 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Cadastro de acomodações
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_acomodacoes'%}">Lista de acomodações cadastradas</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cadastro de acomodações</li>
+  </ol>
+</nav>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Cadastro de acomodações</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <form method="post" action="{% url 'cadastrar_acomodacao'%}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Nome da acomodação: </label>
+        <input type="text" class="form-control" name="nome" placeholder="Nome da acomodação" value="{{request.POST.nome}}" maxlength="50">
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Empreendimento: </label>
+            <select class="form-select text-danger" name="empreendimento">
+              <option value="" selected class="text-danger">---selecione um empreendimento---</option>
+              {% for e in empreendimentos %}
+              <option value="{{e.id}}">{{e.nome}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Tipo de acomodação: </label>
+            <select class="form-select text-danger" name="tipo">
+              <option value="" selected class="text-danger">---selecione o tipo da acomodação---</option>
+              <option value="Apartamento" class="text-danger">Apartamento</option>
+              <option value="Kitinet Simples" class="text-danger">Kitinet Simples</option>
+              <option value="Kitinet Casal" class="text-danger">Kitinet Casal</option>
+              <option value="Kit com sacada" class="text-danger">Kit com sacada</option>
+              <option value="Sobrado" class="text-danger">Sobrado</option>
+              <option value="Casa" class="text-danger">Casa</option>
+              <option value="Flat" class="text-danger">Flat</option>
+              <option value="Combo" class="text-danger">Combo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Nº de quartos: </label>
+            <input type="number" class="form-control" name="quartos" placeholder="Nº de quartos" value="{{request.POST.quartos}}">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Valor base: </label>
+            <input type="number" class="form-control" name="valor_base" placeholder="Valor base" value="{{request.POST.valor_base}}" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Limite ideal de ocupantes: </label>
+            <input type="number" class="form-control" name="limite_ideal" placeholder="Limite ideal de ocupantes" value="{{request.POST.limite_ideal}}">
+          </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Limite adicional de ocupantes permitido: </label>
+            <input type="number" class="form-control" name="limite_adicional" placeholder="Limite adicional de ocupantes permitido" value="{{request.POST.limite_adicional}}">
+          </div>
+        </div>
+      </div>
+
+      
+
+      
+
+      
+
+      
+
+      <div class="mb-3">
+        <label for="" class="form-label">Aceita pet?</label>
+        <div class="">
+          <input type="checkbox" class="" id="pet" name="pet" value="pet">
+          <label class="btn btn-outline-success" for="pet">Marque se aceitar pet</label>      
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Descrição da acomodação: </label>
+        <textarea name="descricao" id="descricao" cols="30" rows="15" class="form-control"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Cadastrar acomodação</button>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+    
+</script>
+
+{% endblock %}

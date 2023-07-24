@@ -5,6 +5,7 @@ from .models import Cliente, Empreendimento, DadosCliente, Acomodacao, Periodo, 
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 #from reservas.utils.gera_pdf_orcamento import gera_pdf_orcamento
 
 import io
@@ -1721,3 +1722,67 @@ def alterar_orcamento(request, id):
         obs_orcamento.save()
         messages.add_message(request, messages.SUCCESS, "Orçamento alterado com sucesso. Você já pode gerar o novo PDF do orçamento")
         return redirect("lista_gera_pdf_orcamento")
+    
+@login_required(login_url="login")
+def lista_acomodacoes(request):
+    acomodacoes = Acomodacao.objects.all().order_by("-id")
+    return render(request, "lista_acomodacoes.html", {"acomodacoes": acomodacoes})
+
+@login_required(login_url="login")
+def cadastrar_acomodacao(request):
+    empreendimentos = Empreendimento.objects.all()
+    if request.method != "POST":
+        return render(request, "form_acomodacao.html", {"empreendimentos": empreendimentos})
+    else:
+        nome = request.POST.get("nome")
+        empreendimento = Empreendimento.objects.get(id=int(request.POST.get("empreendimento")))
+        tipo = request.POST.get("tipo")
+        quartos = int(request.POST.get("quartos"))
+        valor_base = float(request.POST.get("valor_base"))
+        limite_ideal = int(request.POST.get("limite_ideal"))
+        limite_adicional = int(request.POST.get("limite_adicional"))
+        pet = bool(request.POST.get("pet"))
+        descricao = request.POST.get("descricao")
+        if not nome or not empreendimento or not tipo or not descricao:
+            messages.add_message(request, messages.ERROR, "Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_acomodacao.html", {"empreendimentos": empreendimentos})
+        else:
+            acomodacao = Acomodacao(nome=nome, empreendimento=empreendimento, tipo=tipo, quartos=quartos, valor_base=valor_base, limite_ideal=limite_ideal, limite_adicional=limite_adicional, aceita_pet=pet, descricao=descricao)
+            acomodacao.save()
+            messages.add_message(request, messages.SUCCESS, f"Acomodação {acomodacao} cadastrada com sucesso")
+            return redirect("lista_acomodacoes")
+        
+@login_required(login_url="login")
+def alterar_acomodacao(request, id):
+    acomodacao = Acomodacao.objects.get(id=id)
+    empreendimentos = Empreendimento.objects.all()
+    valor = str(acomodacao.valor_base)
+    tipos = ["Apartamento", "Kitnet Simples", "Kitnet Casal", "Kit com sacada", "Sobrado", "Casa", "Flat", "Combo"]
+    if request.method != "POST":
+        return render(request, "form_alterar_acomodacao.html", {"acomodacao": acomodacao, "empreendimentos": empreendimentos, "tipos": tipos, "valor": valor})
+    else:
+        nome = request.POST.get("nome")
+        empreendimento = Empreendimento.objects.get(id=int(request.POST.get("empreendimento")))
+        tipo = request.POST.get("tipo")
+        quartos = int(request.POST.get("quartos"))
+        valor_base = float(request.POST.get("valor_base"))
+        limite_ideal = int(request.POST.get("limite_ideal"))
+        limite_adicional = int(request.POST.get("limite_adicional"))
+        pet = bool(request.POST.get("pet"))
+        descricao = request.POST.get("descricao")
+        if not nome or not empreendimento or not tipo or not descricao:
+            messages.add_message(request, messages.ERROR, "Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_alterar_acomodacao.html", {"acomodacao": acomodacao, "empreendimentos": empreendimentos, "tipos": tipos, "valor": valor})
+        else:
+            acomodacao.nome = nome
+            acomodacao.empreendimento = empreendimento
+            acomodacao.tipo = tipo
+            acomodacao.quartos = quartos
+            acomodacao.valor_base = valor_base
+            acomodacao.limite_ideal = limite_ideal
+            acomodacao.limite_adicional = limite_adicional
+            acomodacao.aceita_pet = pet
+            acomodacao.descricao = descricao
+            acomodacao.save()
+            messages.add_message(request, messages.SUCCESS, f"Acomodação {acomodacao} alterada com sucesso")
+            return redirect("lista_acomodacoes")

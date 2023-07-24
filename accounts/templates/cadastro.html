@@ -5,6 +5,13 @@ Cadastro de usuários
 {% endblock%}
 
 {% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_usuarios'%}">Lista de usuários cadastrados</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cadastro de usuários</li>
+  </ol>
+</nav>
 
 <h1 style="padding-top: 20px;" class="text-center text-primary">Faça seu Cadastro</h1>
 {% include 'parciais/_messages.html'%}
