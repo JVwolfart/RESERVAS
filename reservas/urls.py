@@ -29,4 +29,11 @@ urlpatterns = [
     path('lista_acomodacoes/', views.lista_acomodacoes, name="lista_acomodacoes"),
     path('cadastrar_acomodacao/', views.cadastrar_acomodacao, name="cadastrar_acomodacao"),
     path('alterar_acomodacao/<int:id>', views.alterar_acomodacao, name="alterar_acomodacao"),
+    path('lista_horarios/', views.lista_horarios, name="lista_horarios"),
+    path('cadastrar_horario/', views.cadastrar_horario, name="cadastrar_horario"),
+    path('alterar_horario/<int:id>', views.alterar_horario, name="alterar_horario"),
+    path('lista_obs/', views.lista_obs, name="lista_obs"),
+    path('cadastrar_obs/', views.cadastrar_obs, name="cadastrar_obs"),
+    path('alterar_obs/<int:id>', views.alterar_obs, name="alterar_obs"),
+    path('lista_confirmar_orcamento/', views.lista_confirmar_orcamento, name="lista_confirmar_orcamento"),
 ]

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Cliente, Empreendimento, DadosCliente, Acomodacao, Periodo, Horario, Orcamento, ObsOrcamento, Observacao, Contrato
+from .models import Cliente, Empreendimento, DadosCliente, Acomodacao, Periodo, Horario, Orcamento, ObsOrcamento, Observacao, Contrato, TipoObservacao
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
@@ -1786,3 +1786,117 @@ def alterar_acomodacao(request, id):
             acomodacao.save()
             messages.add_message(request, messages.SUCCESS, f"Acomodação {acomodacao} alterada com sucesso")
             return redirect("lista_acomodacoes")
+        
+@login_required(login_url="login")
+def lista_horarios(request):
+    horarios = Horario.objects.all()
+    return render(request, "lista_horarios.html", {"horarios": horarios})
+
+@login_required(login_url="login")
+def cadastrar_horario(request):
+    if request.method != "POST":
+        return render(request, "form_horario.html")
+    else:
+        hora = request.POST.get("hora")
+        tipo = request.POST.get("checkin")
+        if tipo == "checkin":
+            checkin = True
+        else:
+            checkin = False
+        if not hora or not tipo:
+            messages.add_message(request, messages.ERROR, "Atenção! É necessário descrever o horário, e escolher se será do tipo checkin ou checkout")
+            return render(request, "form_horario.html")
+        else:
+            horario = Horario(hora=hora, checkin=checkin)
+            horario.save()
+            messages.add_message(request, messages.SUCCESS, f"Horário {horario} do tipo {tipo} cadastrado com sucesso")
+            return redirect("lista_horarios")
+        
+@login_required(login_url="login")
+def alterar_horario(request, id):
+    horario = Horario.objects.get(id=id)
+    if request.method != "POST":
+        return render(request, "form_alterar_horario.html", {"horario": horario})
+    else:
+        hora = request.POST.get("hora")
+        tipo = request.POST.get("checkin")
+        if tipo == "checkin":
+            checkin = True
+        else:
+            checkin = False
+        if not hora or not tipo:
+            messages.add_message(request, messages.ERROR, "Atenção! É necessário descrever o horário, e escolher se será do tipo checkin ou checkout")
+            return render(request, "form_alterar_horario.html", {"horario": horario})
+        else:
+            horario.hora = hora
+            horario.checkin = checkin
+            horario.save()
+            messages.add_message(request, messages.SUCCESS, f"Horário {horario} do tipo {tipo} alterado com sucesso")
+            return redirect("lista_horarios")
+        
+@login_required(login_url="login")
+def lista_obs(request):
+    observacoes = Observacao.objects.all()
+    return render(request, "lista_obs.html", {"observacoes": observacoes})
+
+@login_required(login_url="login")
+def cadastrar_obs(request):
+    tipos = TipoObservacao.objects.all()
+    if request.method != "POST":
+        return render(request, "form_obs.html", {"tipos": tipos})
+    else:
+        identificacao = request.POST.get("identificacao")
+        tipo = TipoObservacao.objects.get(id=int(request.POST.get("tipo")))
+        descricao = request.POST.get("descricao")
+        if not identificacao or not tipo or not descricao:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio")
+            return render(request, "form_obs.html", {"tipos": tipos})
+        else:
+            obs = Observacao(identificacao=identificacao, tipo=tipo, descricao=descricao)
+            obs.save()
+            messages.add_message(request, messages.SUCCESS, f"Observação {obs.identificacao} cadastrada com sucesso")
+            return redirect("lista_obs")
+        
+@login_required(login_url="login")
+def alterar_obs(request, id):
+    obs = Observacao.objects.get(id=id)
+    tipos = TipoObservacao.objects.all()
+    if request.method != "POST":
+        return render(request, "form_alterar_obs.html", {"obs": obs, "tipos": tipos})
+    else:
+        identificacao = request.POST.get("identificacao")
+        tipo = TipoObservacao.objects.get(id=int(request.POST.get("tipo")))
+        descricao = request.POST.get("descricao")
+        if not identificacao or not tipo or not descricao:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio")
+            return render(request, "form_alterar_obs.html", {"obs": obs, "tipos": tipos})
+        else:
+            obs.identificacao = identificacao
+            obs.tipo = tipo
+            obs.descricao = descricao
+            obs.save()
+            messages.add_message(request, messages.SUCCESS, f"Observação {obs.identificacao} alterada com sucesso")
+            return redirect("lista_obs")
+        
+@login_required(login_url="login")
+def lista_confirmar_orcamento(request):
+    termo_cliente = request.GET.get("termo_cliente")
+    if termo_cliente:
+        termo_cliente = termo_cliente.strip()
+        orcamentos = Orcamento.objects.all().filter(
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado"
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+        status="contrato gerado"
+        ).exclude(
+            eliminado=True
+        )
+    if len(orcamentos) == 0:
+        messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
+    paginator = Paginator(orcamentos, 10)
+    page = request.GET.get('p')
+    orcamentos = paginator.get_page(page)
+    return render(request, "lista_confirmar_orcamento.html", {"orcamentos": orcamentos})

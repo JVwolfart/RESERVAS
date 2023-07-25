@@ -1,0 +1,62 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Cadastrar horários
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_horarios'%}">Lista de horários cadastrados</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Cadastro de horários</li>
+  </ol>
+</nav>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Cadastro de horários</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <form method="post" action="{% url 'cadastrar_horario'%}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Horário: </label>
+        <input type="text" class="form-control" name="hora" placeholder="Horário" value="{{request.POST.hora}}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Checkin ou checkout?</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="checkin" name="checkin" value="checkin">
+          <label class="form-check-label" for="checkin">
+            Checkin
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" id="checkout" name="checkin" value="checkout">
+          <label class="form-check-label" for="checkout">
+            Checkout
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Adicionar horário</button>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+</script>
+
+{% endblock %}

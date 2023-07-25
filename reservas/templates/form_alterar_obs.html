@@ -1,0 +1,64 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Alterar observações
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_obs'%}">Lista de observações cadastradas</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Alteração de observações</li>
+  </ol>
+</nav>
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alteração de observações</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label">Identificação: </label>
+        <input type="text" class="form-control" name="identificacao" placeholder="Identificação" value="{{obs.identificacao}}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Tipo de observação</label>
+        <select class="form-select text-danger" name="tipo">
+          {% for t in tipos %}
+          {% if t == obs.tipo %}
+          <option value="{{t.id}}" class="text-danger" selected>{{t.tipo}}</option>
+          {% else %}
+          <option value="{{t.id}}" class="text-danger">{{t.tipo}}</option>
+          {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Texto da observação: </label>
+        <textarea name="descricao" id="descricao" cols="30" rows="15" class="form-control">{{obs.descricao}}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Alterar observação</button>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+</script>
+
+{% endblock %}
