@@ -19,7 +19,7 @@ Home
 <div class="row">
     <div class="row py-5">
     
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
     
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'clientes'%}" style="text-decoration:none">
@@ -29,7 +29,7 @@ Home
                 </a>
             </div>
         </div>
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'gera_orcamento'%}"style="text-decoration:none">
                     <img src="{% static 'img/gerar_orcamento.png'%}" style="width:150px; height: 150px;">
@@ -38,7 +38,7 @@ Home
                 </a>
             </div>
         </div>
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'lista_orçamentos_geral'%}"style="text-decoration:none">
                     <img src="{% static 'img/listar_orcamentos.png'%}" style="width:150px; height: 150px;">
@@ -47,7 +47,7 @@ Home
                 </a>
             </div>
         </div>
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'lista_alterar_orcamento'%}"style="text-decoration:none">
                     <img src="{% static 'img/alterar_orcamento.png'%}" style="width:150px; height: 150px;">
@@ -57,7 +57,7 @@ Home
             </div>
         </div>
 
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'lista_eliminar_orcamento'%}"style="text-decoration:none">
                     <img src="{% static 'img/eliminar_orcamento.png'%}" style="width:150px; height: 150px;">
@@ -67,12 +67,22 @@ Home
             </div>
         </div>
         
-        <div class="col-md-4 col-6 mb-5">
+        <div class="col-md-3 col-6 mb-5">
             <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
                 <a href="{% url 'lista_eliminar_contrato'%}"style="text-decoration:none">
                     <img src="{% static 'img/eliminar_contrato.png'%}" style="width:150px; height: 150px;">
                     <br>
                     Eliminar Contrato
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_confirmar_orcamento'%}"style="text-decoration:none">
+                    <img src="{% static 'img/icone_pagamento.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Informar Pagamento/extras
                 </a>
             </div>
         </div>

@@ -1918,8 +1918,8 @@ def lista_confirmar_orcamento(request):
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
     orcamentos = paginator.get_page(page)
-    orcamentos = zip(orcamentos, saldos)
-    return render(request, "lista_confirmar_orcamento.html", {"orcamentos": orcamentos})
+    orcamentos_saldos = zip(orcamentos, saldos)
+    return render(request, "lista_confirmar_orcamento.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
 
 @login_required(login_url="login")
 def registrar_pagamento(request, id):
