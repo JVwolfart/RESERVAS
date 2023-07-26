@@ -330,8 +330,10 @@ def gera_pdf_orc(request, id):
     ### variáveis do projeto
     if orc.modificado:
         modificado = "***Modificado"
+        motivo = f"Motivo: {orc.obs_modificacao}"
     else:
         modificado = ""
+        motivo = ""
     data_orçamento = f"{datetime.strftime(orc.data_orcamento, '%d de %b de %Y')}"
     n_orçamento=f"{orc.id}"
     hospede = f"{orc.cliente}"
@@ -680,7 +682,8 @@ def gera_pdf_orc(request, id):
     p_info.drawOn(cnv, coluna+5, 50)
 
     cnv.setFont(padr, 7)
-    cnv.drawRightString(mm2p(200), mm2p(5), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(7), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(5), motivo)
     cnv.showPage()
     cnv.save()
 
@@ -720,8 +723,10 @@ def vizualizar_pdf(request, id):
     ### variáveis do projeto
     if orc.modificado:
         modificado = "***Modificado"
+        motivo = f"Motivo: {orc.obs_modificacao}"
     else:
         modificado = ""
+        motivo = ""
     data_orçamento = f"{datetime.strftime(orc.data_orcamento, '%d de %b de %Y')}"
     n_orçamento=f"{orc.id}"
     hospede = f"{orc.cliente}"
@@ -1070,7 +1075,8 @@ def vizualizar_pdf(request, id):
     p_info.drawOn(cnv, coluna+5, 50)
 
     cnv.setFont(padr, 7)
-    cnv.drawRightString(mm2p(200), mm2p(5), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(7), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(5), motivo)
     cnv.showPage()
     cnv.save()
 
@@ -1139,6 +1145,12 @@ def visualizar_pdf_contrato(request, id):
     #ZapfDingbats
 
     ### variáveis do projeto
+    if orc.modificado:
+        modificado = "***Modificado"
+        motivo = f"Motivo: {orc.obs_modificacao}"
+    else:
+        modificado = ""
+        motivo = ""
     
     data_contrato = f"{datetime.strftime(obs_contrato.data_contrato, '%d de %b de %Y')}"
     #print (data_contrato)
@@ -1480,6 +1492,10 @@ def visualizar_pdf_contrato(request, id):
     p_info.wrapOn(cnv, 270, 80)
     p_info.drawOn(cnv, coluna+5, 50)
 
+    cnv.setFont(padr, 7)
+    cnv.drawRightString(mm2p(200), mm2p(7), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(5), motivo)
+    
 
     #cnv.rect(mm2p(2),mm2p(linha-45),mm2p(205),mm2p(41))
 
@@ -1566,12 +1582,11 @@ def lista_eliminar_contrato(request):
 @login_required(login_url="login")
 def eliminar_contrato(request, id):
     orcamento = Orcamento.objects.get(id=id)
-    if orcamento.eliminado:
-        orcamento.eliminado = False
-        messages.add_message(request, messages.INFO, f"Contrato {orcamento.id} de {orcamento} reativado com sucesso")
-    else:
-        orcamento.eliminado = True
-        messages.add_message(request, messages.INFO, f"Contrato {orcamento.id} de {orcamento} eliminado com sucesso")
+    contrato = Contrato.objects.all().filter(orcamento=orcamento)
+    orcamento.eliminado = True
+    orcamento.status = "orçamento gerado"
+    contrato.delete()
+    messages.add_message(request, messages.INFO, f"Contrato {orcamento.id} de {orcamento} foi eliminado com sucesso, caso queira utilizar e alterar este orçamentro, deve primeiro reativar o orçamento, logo em seguida fazer as alterações necessárias e depois gerar novo orçamento e novo contrato")
     orcamento.save()
     return redirect("lista_eliminar_contrato")
 
@@ -1789,7 +1804,7 @@ def alterar_acomodacao(request, id):
         
 @login_required(login_url="login")
 def lista_horarios(request):
-    horarios = Horario.objects.all()
+    horarios = Horario.objects.all().order_by("-checkin")
     return render(request, "lista_horarios.html", {"horarios": horarios})
 
 @login_required(login_url="login")
@@ -1836,7 +1851,7 @@ def alterar_horario(request, id):
         
 @login_required(login_url="login")
 def lista_obs(request):
-    observacoes = Observacao.objects.all()
+    observacoes = Observacao.objects.all().order_by("tipo")
     return render(request, "lista_obs.html", {"observacoes": observacoes})
 
 @login_required(login_url="login")
