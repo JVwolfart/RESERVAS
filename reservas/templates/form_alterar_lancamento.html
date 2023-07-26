@@ -1,0 +1,74 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Lançamentos
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_confirmar_orcamento'%}">Lista confirmar Orçamento</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'registrar_pagamento' lancamento.orcamento.id%}">Registrar pagamentos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Alterar pagamento</li>
+  </ol>
+</nav>
+
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alterar pagamento</h1>
+{% include 'parciais/_messages.html'%}
+
+
+<div class="col-12">
+
+
+    <form method="post" action="{% url 'alterar_pagamento' lancamento.id %}" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Descrição do lançamento</label>
+        <input type="text" class="form-control" placeholder="Descrição do lançamento" name="descricao" value="{{lancamento.descricao}}">
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Data do lançamento</label>
+            <input type="date" class="form-control" placeholder="Data do lançamento" name="data_lancamento" value="{{data_lancamento}}">
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Valor do lançamento</label>
+            <input type="number" class="form-control" placeholder="Valor do lançamento" name="valor" min="0" step="0,01" value="{{valor}}">
+          </div>
+        </div>
+      </div>
+
+
+      <div class="mb-3">
+
+      </div>
+      <button type="submit" class="btn btn-primary">Alterar pagamento</button>
+      <a class="btn btn-danger" href="{% url 'registrar_pagamento' lancamento.orcamento.id%}">Cancelar e retornar</a>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+{% endblock %}

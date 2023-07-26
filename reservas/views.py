@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Cliente, Empreendimento, DadosCliente, Acomodacao, Periodo, Horario, Orcamento, ObsOrcamento, Observacao, Contrato, TipoObservacao
+from .models import Cliente, Empreendimento, DadosCliente, Acomodacao, Periodo, Horario, Orcamento, ObsOrcamento, Observacao, Contrato, TipoObservacao, Lancamentos
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
@@ -1908,10 +1908,152 @@ def lista_confirmar_orcamento(request):
         status="contrato gerado"
         ).exclude(
             eliminado=True
-        )
+        ).order_by("-id")
+    saldos = []
+    for o in orcamentos:
+        saldo = o.total_valor_reserva + o.valor_extras - o.valor_pago
+        saldos.append(saldo)
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
     orcamentos = paginator.get_page(page)
+    orcamentos = zip(orcamentos, saldos)
     return render(request, "lista_confirmar_orcamento.html", {"orcamentos": orcamentos})
+
+@login_required(login_url="login")
+def registrar_pagamento(request, id):
+    orcamento = Orcamento.objects.get(id=id)
+    lancamentos = Lancamentos.objects.all().filter(
+        orcamento=orcamento
+    )
+    if request.method != "POST":
+        return render(request, "form_lancamento.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+    else:
+        descricao = request.POST.get("descricao")
+        data_lancamento = request.POST.get("data_lancamento")
+        valor = request.POST.get("valor")
+        if not descricao or not data_lancamento or not valor:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_lancamento.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+        descricao = descricao.strip().title()
+        valor = float(valor)
+        data_lancamento = datetime.strptime(data_lancamento, "%Y-%m-%d")
+        if valor <= 0:
+            messages.add_message(request, messages.ERROR, "Atenção! Valor do lançamento deve ser maior que zero. Por favor verifique")
+            return render(request, "form_lancamento.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+        orcamento.valor_pago = float(orcamento.valor_pago)+valor
+        orcamento.confirmado = True
+        lancamento = Lancamentos(orcamento=orcamento, descricao=descricao, data_lancamento=data_lancamento, valor=valor, tipo="pagamento")
+        lancamento.save()
+        orcamento.save()
+        messages.add_message(request, messages.SUCCESS, f"Pagamento de R$ {valor:.2f} lançado com sucesso para o orçamento {orcamento.id}")
+        return redirect("lista_confirmar_orcamento")
+    
+@login_required(login_url="login")
+def alterar_pagamento(request, id):
+    lancamento = Lancamentos.objects.get(id=id)
+    data_lancamento = datetime.strftime(lancamento.data_lancamento, "%Y-%m-%d")
+    valor = str(lancamento.valor)
+    if request.method != "POST":
+        return render(request, "form_alterar_lancamento.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+    else:
+        nova_descricao = request.POST.get("descricao")
+        nova_data_lancamento = request.POST.get("data_lancamento")
+        novo_valor = request.POST.get("valor")
+        if not nova_descricao or not nova_data_lancamento or not novo_valor:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_alterar_lancamento.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+        lancamento.orcamento.valor_pago = float(lancamento.orcamento.valor_pago)-float(lancamento.valor)
+        nova_descricao = nova_descricao.strip().title()
+        novo_valor = float(novo_valor)
+        nova_data_lancamento = datetime.strptime(nova_data_lancamento, "%Y-%m-%d")
+        if novo_valor <= 0:
+            messages.add_message(request, messages.ERROR, "Atenção! Valor do lançamento deve ser maior que zero. Por favor verifique")
+            return render(request, "form_alterar_lancamento.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+        lancamento.orcamento.valor_pago = float(lancamento.orcamento.valor_pago)+novo_valor
+        lancamento.descricao = nova_descricao
+        lancamento.data_lancamento = nova_data_lancamento
+        lancamento.valor = novo_valor
+        lancamento.save()
+        lancamento.orcamento.save()
+        messages.add_message(request, messages.SUCCESS, f"Pagamento alterado com sucesso para o orçamento {lancamento.orcamento.id}")
+        return redirect("lista_confirmar_orcamento")
+
+@login_required(login_url="login")
+def excluir_pagamento(request, id):
+    lancamento = Lancamentos.objects.get(id=id)
+    lancamento.orcamento.valor_pago = float(lancamento.orcamento.valor_pago)-float(lancamento.valor)
+    if lancamento.orcamento.valor_pago == 0:
+        lancamento.orcamento.confirmado = False
+    lancamento.orcamento.save()
+    messages.add_message(request, messages.SUCCESS, f"Lançamento {lancamento.id} excluido com sucesso para o orçamento {lancamento.orcamento.id}")
+    lancamento.delete()
+    return redirect("lista_confirmar_orcamento")
+
+@login_required(login_url="login")
+def registrar_extra(request, id):
+    orcamento = Orcamento.objects.get(id=id)
+    lancamentos = Lancamentos.objects.all().filter(
+        orcamento=orcamento
+    )
+    if request.method != "POST":
+        return render(request, "form_extras.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+    else:
+        descricao = request.POST.get("descricao")
+        data_lancamento = request.POST.get("data_lancamento")
+        valor = request.POST.get("valor")
+        if not descricao or not data_lancamento or not valor:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_extras.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+        descricao = descricao.strip().title()
+        valor = float(valor)
+        data_lancamento = datetime.strptime(data_lancamento, "%Y-%m-%d")
+        if valor <= 0:
+            messages.add_message(request, messages.ERROR, "Atenção! Valor do lançamento deve ser maior que zero. Por favor verifique")
+            return render(request, "form_extras.html", {"orcamento": orcamento, "lancamentos": lancamentos})
+        orcamento.valor_extras = float(orcamento.valor_extras)+valor
+        lancamento = Lancamentos(orcamento=orcamento, descricao=descricao, data_lancamento=data_lancamento, valor=valor, tipo="acréscimo")
+        lancamento.save()
+        orcamento.save()
+        messages.add_message(request, messages.SUCCESS, f"Cobrança extra de R$ {valor:.2f} lançada com sucesso para o orçamento {orcamento.id}")
+        return redirect("lista_confirmar_orcamento")
+    
+@login_required(login_url="login")
+def alterar_extra(request, id):
+    lancamento = Lancamentos.objects.get(id=id)
+    data_lancamento = datetime.strftime(lancamento.data_lancamento, "%Y-%m-%d")
+    valor = str(lancamento.valor)
+    if request.method != "POST":
+        return render(request, "form_alterar_extra.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+    else:
+        nova_descricao = request.POST.get("descricao")
+        nova_data_lancamento = request.POST.get("data_lancamento")
+        novo_valor = request.POST.get("valor")
+        if not nova_descricao or not nova_data_lancamento or not novo_valor:
+            messages.add_message(request, messages.ERROR, "Atenção! Nenhum campo pode ficar vazio. Por favor verifique")
+            return render(request, "form_alterar_extra.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+        lancamento.orcamento.valor_extras = float(lancamento.orcamento.valor_extras)-float(lancamento.valor)
+        nova_descricao = nova_descricao.strip().title()
+        novo_valor = float(novo_valor)
+        nova_data_lancamento = datetime.strptime(nova_data_lancamento, "%Y-%m-%d")
+        if novo_valor <= 0:
+            messages.add_message(request, messages.ERROR, "Atenção! Valor do lançamento deve ser maior que zero. Por favor verifique")
+            return render(request, "form_alterar_extra.html", {"lancamento": lancamento, "data_lancamento": data_lancamento, "valor": valor})
+        lancamento.orcamento.valor_extras = float(lancamento.orcamento.valor_extras)+novo_valor
+        lancamento.descricao = nova_descricao
+        lancamento.data_lancamento = nova_data_lancamento
+        lancamento.valor = novo_valor
+        lancamento.save()
+        lancamento.orcamento.save()
+        messages.add_message(request, messages.SUCCESS, f"Cobrança extra alterada com sucesso para o orçamento {lancamento.orcamento.id}")
+        return redirect("lista_confirmar_orcamento")
+    
+@login_required(login_url="login")
+def excluir_extra(request, id):
+    lancamento = Lancamentos.objects.get(id=id)
+    lancamento.orcamento.valor_extras = float(lancamento.orcamento.valor_extras)-float(lancamento.valor)
+    lancamento.orcamento.save()
+    messages.add_message(request, messages.SUCCESS, f"Lançamento {lancamento.id} excluido com sucesso para o orçamento {lancamento.orcamento.id}")
+    lancamento.delete()
+    return redirect("lista_confirmar_orcamento")

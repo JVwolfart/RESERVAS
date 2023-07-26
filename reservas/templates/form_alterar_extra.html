@@ -1,0 +1,74 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Lançamentos
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista_confirmar_orcamento'%}">Lista confirmar Orçamento</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'registrar_extra' lancamento.orcamento.id%}">Registrar cobranças extras</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Alterar cobrança extra</li>
+  </ol>
+</nav>
+
+<h1 style="padding-top: 20px;" class="text-center text-primary">Alterar cobrança extra</h1>
+{% include 'parciais/_messages.html'%}
+
+
+<div class="col-12">
+
+
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Descrição do extra</label>
+        <input type="text" class="form-control" placeholder="Descrição do extra" name="descricao" value="{{lancamento.descricao}}">
+      </div>
+
+
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Data do extra</label>
+            <input type="date" class="form-control" placeholder="Data do extra" name="data_lancamento" value="{{data_lancamento}}">
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <div class="mb-3">
+            <label class="form-label">Valor do extra</label>
+            <input type="number" class="form-control" placeholder="Valor do extra" name="valor" min="0" step="0,01" value="{{valor}}">
+          </div>
+        </div>
+      </div>
+
+
+      <div class="mb-3">
+
+      </div>
+      <button type="submit" class="btn btn-primary">Alterar extra</button>
+      <a class="btn btn-danger" href="{% url 'registrar_extra' lancamento.orcamento.id%}">Cancelar e retornar</a>
+    </form>
+
+    <div class="row">
+        <div style="height: 400px; text-align: center;">
+          <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+<script type="text/javascript">
+
+</script>
+
+{% endblock %}

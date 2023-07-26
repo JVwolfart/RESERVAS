@@ -34,12 +34,14 @@ Contratos gerados
               <th scope="col">Acomodação</th>
               <th scope="col">Confirmado</th>
               <th scope="col">Valor total</th>
+              <th scope="col">Cobrança extra</th>
               <th scope="col">Valor pago</th>
+              <th scope="col">Saldo a pagar</th>
               <th scope="col">Ação</th>
             </tr>
           </thead>
           <tbody>
-            {% for o in orcamentos %}
+            {% for o, s in orcamentos %}
             <tr>
                 <td>{{o.id}}</td>
                 <td class="">{{o.cliente}}</td>
@@ -50,8 +52,11 @@ Contratos gerados
                 <td class="text-danger">Não</td>
                 {% endif %}
                 <td class="">R$ {{o.total_valor_reserva}}</td>
+                <td class="">R$ {{o.valor_extras}}</td>
                 <td class="">R$ {{o.valor_pago}}</td>
-                <td class=""><a href="" class="btn btn-success">Informar pagamento</a></td>
+                <td class="">R$ {{s}}</td>
+                <td class=""><a href="{% url 'registrar_pagamento' o.id%}" class="btn btn-success">Informar pagamento</a></td>
+                <td class=""><a href="{% url 'registrar_extra' o.id%}" class="btn btn-primary">Informar acréscimo</a></td>
             </tr>
             {% endfor %}
           </tbody>

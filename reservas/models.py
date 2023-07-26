@@ -91,6 +91,7 @@ class Orcamento(models.Model):
     total_valor_reserva = models.DecimalField(default=0, max_digits=7, decimal_places=2)
     confirmado = models.BooleanField(default=False)
     valor_pago = models.DecimalField(default=0, max_digits=7, decimal_places=2)
+    valor_extras = models.DecimalField(default=0, max_digits=7, decimal_places=2)
 
     def __str__(self):
         return f"{self.acomodacao} - {self.cliente} - {self.data_entrada}"
@@ -129,10 +130,12 @@ class Contrato(models.Model):
         return f"Contrato {self.orcamento.id} de {self.orcamento.cliente} {self.orcamento.acomodacao}"
     
 
-class Depositos(models.Model):
+class Lancamentos(models.Model):
     orcamento = models.ForeignKey(Orcamento, on_delete=models.CASCADE)
     descricao = models.CharField(max_length=100)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
+    data_lancamento = models.DateField(default=timezone.now)
+    tipo = models.CharField(max_length=10, choices=(("pagamento", "pagamento"), ("acréscimo", "acréscimo")))
 
     def __str__(self) -> str:
-        return f"Orçamento Nº {self.orcamento.id} - {self.descricao} do cliente {self.orcamento.cliente}"
+        return f"{self.tipo} Orçamento Nº {self.orcamento.id} do cliente {self.orcamento.cliente}"

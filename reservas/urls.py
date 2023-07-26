@@ -36,4 +36,10 @@ urlpatterns = [
     path('cadastrar_obs/', views.cadastrar_obs, name="cadastrar_obs"),
     path('alterar_obs/<int:id>', views.alterar_obs, name="alterar_obs"),
     path('lista_confirmar_orcamento/', views.lista_confirmar_orcamento, name="lista_confirmar_orcamento"),
+    path('registrar_pagamento/<int:id>', views.registrar_pagamento, name="registrar_pagamento"),
+    path('alterar_pagamento/<int:id>', views.alterar_pagamento, name="alterar_pagamento"),
+    path('excluir_pagamento/<int:id>', views.excluir_pagamento, name="excluir_pagamento"),
+    path('registrar_extra/<int:id>', views.registrar_extra, name="registrar_extra"),
+    path('alterar_extra/<int:id>', views.alterar_extra, name="alterar_extra"),
+    path('excluir_extra/<int:id>', views.excluir_extra, name="excluir_extra"),
 ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Empreendimento, Acomodacao, TipoObservacao, Observacao, DadosCliente, Orcamento, Periodo, Horario, ObsOrcamento, Contrato
+from .models import Cliente, Empreendimento, Acomodacao, TipoObservacao, Observacao, DadosCliente, Orcamento, Periodo, Horario, ObsOrcamento, Contrato, Lancamentos
 # Register your models here.
 
 class AdmCliente(admin.ModelAdmin):
@@ -69,6 +69,12 @@ class AdmContrato(admin.ModelAdmin):
     search_fields = ["orcamento"]
     list_filter = ("orcamento",)
 
+class AdmLancamento(admin.ModelAdmin):
+    list_display = ("orcamento", "descricao", "data_lancamento", "valor", "tipo")
+    list_per_page = 10
+    search_fields = ["orcamento", "descricao", "data_lancamento", "tipo"]
+    list_filter = ("orcamento", "tipo",)
+
 admin.site.register(Cliente, AdmCliente)
 admin.site.register(Empreendimento, AdmEmpreendimento)
 admin.site.register(Acomodacao, AdmAcomodacao)
@@ -80,3 +86,4 @@ admin.site.register(Periodo, AdmPeriodo)
 admin.site.register(Horario, AdmHorario)
 admin.site.register(ObsOrcamento, AdmObsOrcamento)
 admin.site.register(Contrato, AdmContrato)
+admin.site.register(Lancamentos, AdmLancamento)
