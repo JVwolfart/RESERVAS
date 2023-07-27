@@ -87,6 +87,36 @@ Home
             </div>
         </div>
 
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_orcamentos_pendentes'%}"style="text-decoration:none">
+                    <img src="{% static 'img/icone_aguardando_confimacao.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Contratos aguardando depósito
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_orcamentos_confirmados'%}"style="text-decoration:none">
+                    <img src="{% static 'img/sim.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Contratos confirmados
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-3 col-6 mb-5">
+            <div style="box-shadow: 10px 10px 10px rgb(175, 175, 175); background-color:aquamarine; border-radius: 20px;" class="py-3 px-3 text-center">
+                <a href="{% url 'lista_orcamentos_quitados'%}"style="text-decoration:none">
+                    <img src="{% static 'img/dinheiro.png'%}" style="width:150px; height: 150px;">
+                    <br>
+                    Lista contratos quitados
+                </a>
+            </div>
+        </div>
+
     </div>
     
 </div>

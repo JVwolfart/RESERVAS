@@ -92,6 +92,7 @@ class Orcamento(models.Model):
     confirmado = models.BooleanField(default=False)
     valor_pago = models.DecimalField(default=0, max_digits=7, decimal_places=2)
     valor_extras = models.DecimalField(default=0, max_digits=7, decimal_places=2)
+    quitado = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.acomodacao} - {self.cliente} - {self.data_entrada}"

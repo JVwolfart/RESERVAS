@@ -700,11 +700,11 @@ def lista_orçamentos_concluidos(request):
     if termo_cliente:
         termo_cliente = termo_cliente.strip()
         orcamentos = Orcamento.objects.all().filter(
-            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), Q(status="orçamento gerado") | Q(status="contrato gerado")
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), Q(status="orçamento gerado") | Q(status="contrato gerado"), quitado=False
         ).exclude(eliminado=True).order_by("-id")
     else:
         orcamentos = Orcamento.objects.all().filter(
-            Q(status="orçamento gerado") | Q(status="contrato gerado")
+            Q(status="orçamento gerado") | Q(status="contrato gerado"), quitado=False
         ).exclude(eliminado=True).order_by("-id")
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
@@ -1566,11 +1566,11 @@ def lista_eliminar_contrato(request):
     if termo_cliente:
         termo_cliente = termo_cliente.strip()
         orcamentos = Orcamento.objects.all().filter(
-            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado"
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", quitado=False
         ).order_by("-id")
     else:
         orcamentos = Orcamento.objects.all().filter(
-            status="contrato gerado"
+            status="contrato gerado", quitado=False
         ).order_by("-id")
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
@@ -1899,13 +1899,13 @@ def lista_confirmar_orcamento(request):
     if termo_cliente:
         termo_cliente = termo_cliente.strip()
         orcamentos = Orcamento.objects.all().filter(
-            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado"
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", quitado=False
         ).exclude(
             eliminado=True
         ).order_by("-id")
     else:
         orcamentos = Orcamento.objects.all().filter(
-        status="contrato gerado"
+        status="contrato gerado", quitado=False
         ).exclude(
             eliminado=True
         ).order_by("-id")
@@ -2057,3 +2057,129 @@ def excluir_extra(request, id):
     messages.add_message(request, messages.SUCCESS, f"Lançamento {lancamento.id} excluido com sucesso para o orçamento {lancamento.orcamento.id}")
     lancamento.delete()
     return redirect("lista_confirmar_orcamento")
+
+@login_required(login_url="login")
+def lista_orcamentos_confirmados(request):
+    termo_cliente = request.GET.get("termo_cliente")
+    if termo_cliente:
+        termo_cliente = termo_cliente.strip()
+        orcamentos = Orcamento.objects.all().filter(
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", confirmado=True, quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+        status="contrato gerado", confirmado=True, quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    saldos = []
+    for o in orcamentos:
+        saldo = o.total_valor_reserva + o.valor_extras - o.valor_pago
+        saldos.append(saldo)
+    if len(orcamentos) == 0:
+        messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
+    paginator = Paginator(orcamentos, 10)
+    page = request.GET.get('p')
+    orcamentos = paginator.get_page(page)
+    orcamentos_saldos = zip(orcamentos, saldos)
+    return render(request, "lista_orcamentos_confirmados.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
+
+@login_required(login_url="login")
+def lista_orcamentos_pendentes(request):
+    termo_cliente = request.GET.get("termo_cliente")
+    if termo_cliente:
+        termo_cliente = termo_cliente.strip()
+        orcamentos = Orcamento.objects.all().filter(
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", confirmado=False, quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+        status="contrato gerado", confirmado=False, quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    saldos = []
+    for o in orcamentos:
+        saldo = o.total_valor_reserva + o.valor_extras - o.valor_pago
+        saldos.append(saldo)
+    if len(orcamentos) == 0:
+        messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
+    paginator = Paginator(orcamentos, 10)
+    page = request.GET.get('p')
+    orcamentos = paginator.get_page(page)
+    orcamentos_saldos = zip(orcamentos, saldos)
+    return render(request, "lista_orcamentos_pendentes.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
+
+@login_required(login_url="login")
+def lista_orcamentos_quitados(request):
+    termo_cliente = request.GET.get("termo_cliente")
+    if termo_cliente:
+        termo_cliente = termo_cliente.strip()
+        orcamentos = Orcamento.objects.all().filter(
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", confirmado=True, quitado=True
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+        status="contrato gerado", confirmado=True, quitado=True
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    saldos = []
+    for o in orcamentos:
+        saldo = o.total_valor_reserva + o.valor_extras - o.valor_pago
+        saldos.append(saldo)
+    if len(orcamentos) == 0 and termo_cliente:
+        messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
+    paginator = Paginator(orcamentos, 10)
+    page = request.GET.get('p')
+    orcamentos = paginator.get_page(page)
+    orcamentos_saldos = zip(orcamentos, saldos)
+    return render(request, "lista_orcamentos_quitados.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
+
+
+@login_required(login_url="login")
+def quitar_orcamento(request, id):
+    orcamento = Orcamento.objects.get(id=id)
+    if orcamento.quitado == False:
+        orcamento.quitado = True
+        messages.add_message(request, messages.SUCCESS, f"Orçamento Nº {orcamento.id} quitado com sucesso")
+    else:
+        orcamento.quitado = False
+        messages.add_message(request, messages.SUCCESS, f"Quitação do orçamento Nº {orcamento.id} cancelada com sucesso. Você pode rever esse orçamento na lista de orçamentos confirmados")
+    orcamento.save()
+    return redirect("lista_orcamentos_quitados")
+
+
+@login_required(login_url="login")
+def lista_relatorio_reservas(request):
+    termo_cliente = request.GET.get("termo_cliente")
+    if termo_cliente:
+        termo_cliente = termo_cliente.strip()
+        orcamentos = Orcamento.objects.all().filter(
+            Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), status="contrato gerado", quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+        status="contrato gerado", quitado=False
+        ).exclude(
+            eliminado=True
+        ).order_by("-id")
+    saldos = []
+    for o in orcamentos:
+        saldo = o.total_valor_reserva + o.valor_extras - o.valor_pago
+        saldos.append(saldo)
+    if len(orcamentos) == 0:
+        messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
+    paginator = Paginator(orcamentos, 10)
+    page = request.GET.get('p')
+    orcamentos = paginator.get_page(page)
+    orcamentos_saldos = zip(orcamentos, saldos)
+    return render(request, "lista_relatorio_reservas.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})

@@ -42,4 +42,9 @@ urlpatterns = [
     path('registrar_extra/<int:id>', views.registrar_extra, name="registrar_extra"),
     path('alterar_extra/<int:id>', views.alterar_extra, name="alterar_extra"),
     path('excluir_extra/<int:id>', views.excluir_extra, name="excluir_extra"),
+    path('lista_orcamentos_confirmados/', views.lista_orcamentos_confirmados, name="lista_orcamentos_confirmados"),
+    path('lista_orcamentos_pendentes/', views.lista_orcamentos_pendentes, name="lista_orcamentos_pendentes"),
+    path('quitar_orcamento/<int:id>', views.quitar_orcamento, name="quitar_orcamento"),
+    path('lista_orcamentos_quitados/', views.lista_orcamentos_quitados, name="lista_orcamentos_quitados"),
+    path('lista_relatorio_reservas/', views.lista_relatorio_reservas, name="lista_relatorio_reservas"),
 ]
