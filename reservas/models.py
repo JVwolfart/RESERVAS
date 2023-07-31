@@ -3,7 +3,7 @@ from django.utils import timezone
 
 class Cliente(models.Model):
     nome = models.CharField(max_length=30)
-    telefone = models.CharField(max_length=20, blank=True, null=True)
+    telefone = models.CharField(max_length=20, blank=True,)
     obs = models.CharField(max_length=100)
     dados_adicionais = models.BooleanField(default=False)
 
@@ -71,7 +71,7 @@ class Orcamento(models.Model):
     checkout = models.CharField(max_length=100)
     data_orcamento = models.DateField(default=timezone.now)
     n_ocupantes = models.IntegerField(default=0)
-    obs_n_ocupantes = models.CharField(max_length=150, blank=True, null=True)
+    obs_n_ocupantes = models.CharField(max_length=150, blank=True,)
     n_dias = models.IntegerField()
     valor_diaria = models.DecimalField(default=0, max_digits=7, decimal_places=2)
     taxa_limpeza = models.DecimalField(default=0, max_digits=6, decimal_places=2)
@@ -85,7 +85,7 @@ class Orcamento(models.Model):
     #contrato_gerado = models.BooleanField(default=False)
     #finalizado = models.BooleanField(default=False)
     modificado = models.BooleanField(default=False)
-    obs_modificacao = models.CharField(max_length=200, blank=True, null=True)
+    obs_modificacao = models.CharField(max_length=200, blank=True,)
     eliminado = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=(("em digitação", "em digitação"), ("digitação concluída", "digitação concluída"), ("orçamento gerado", "orçamento gerado"), ("contrato gerado", "contrato gerado"),))
     total_valor_reserva = models.DecimalField(default=0, max_digits=7, decimal_places=2)
@@ -122,10 +122,10 @@ class ObsOrcamento(models.Model):
 class Contrato(models.Model):
     orcamento = models.ForeignKey(Orcamento, on_delete=models.CASCADE)
     data_contrato = models.DateField(default=timezone.now)
-    aviso_contrato = models.TextField(blank=True, null=True)
-    info_adic_contrato = models.TextField(blank=True, null=True)
-    conta_deposito = models.TextField(blank=True, null=True)
-    cond_pag_contrato = models.TextField(blank=True, null=True)
+    aviso_contrato = models.TextField(blank=True,)
+    info_adic_contrato = models.TextField(blank=True,)
+    conta_deposito = models.TextField(blank=True,)
+    cond_pag_contrato = models.TextField(blank=True,)
 
     def __str__(self):
         return f"Contrato {self.orcamento.id} de {self.orcamento.cliente} {self.orcamento.acomodacao}"

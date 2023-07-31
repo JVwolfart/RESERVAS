@@ -56,6 +56,7 @@ Orçamentos quitados
                 <td class="">R$ {{o.valor_pago}}</td>
                 <td class="">R$ {{s}}</td>
                 <td class=""><a href="{% url 'quitar_orcamento' o.id%}" class="btn btn-warning">Cancelar quitação</a></td>
+                <td class=""><a href="{% url 'visualizar_relatorio_financeiro' o.id%}" target="_blank" class="btn btn-success">Relatório financeiro</a></td>
             </tr>
             {% endfor %}
           </tbody>

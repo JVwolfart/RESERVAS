@@ -55,7 +55,7 @@ Relatório financeiro da reserva
                 <td class="">R$ {{o.valor_extras}}</td>
                 <td class="">R$ {{o.valor_pago}}</td>
                 <td class="">R$ {{s}}</td>
-                <td class=""><a href="" class="btn btn-success">Visualizar relatório</a></td>
+                <td class=""><a href="{% url 'visualizar_relatorio_financeiro' o.id %}" class="btn btn-success" target="_blank">Visualizar relatório</a></td>
             </tr>
             {% endfor %}
           </tbody>

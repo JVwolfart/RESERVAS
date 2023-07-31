@@ -104,7 +104,6 @@
                     <a href="{% url 'lista_orcamentos_confirmados'%}" class="list-group-item list-group-item-action my-3">Lista de reservas confirmadas</a>
                     <a href="{% url 'lista_orcamentos_pendentes'%}" class="list-group-item list-group-item-action my-3">Lista de reservas pendentes</a>
                     <a href="{% url 'lista_orcamentos_quitados'%}" class="list-group-item list-group-item-action my-3">Lista de orçamentos quitados</a>
-                    <a href="{% url 'lista_relatorio_reservas'%}" class="list-group-item list-group-item-action my-3">Relatório financeiro da reserva</a>
                   </ul>
                 </div>
               </div>
@@ -132,14 +131,14 @@
             <div class="accordion-item bg-success">
               <h2 class="accordion-header" id="flush-headingFive">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFive" aria-expanded="false" aria-controls="flush-collapseFive">
-                  Quem somos
+                  Relatórios
                 </button>
               </h2>
               <div id="flush-collapseFive" class="accordion-collapse collapse" aria-labelledby="flush-headingFive" data-bs-parent="#accordionFlushExample">
                 <div class="accordion-body">
                   <ul class="">
-                    <a href="" class="list-group-item list-group-item-action my-3">Documentação</a>
-                    <a href="" class="list-group-item list-group-item-action my-3">Desenvolvedores</a>
+                    <a href="{% url 'lista_relatorio_reservas'%}" class="list-group-item list-group-item-action my-3">Relatório financeiro da reserva</a>
+                    <a href="{% url 'lista_checkout' %}" class="list-group-item list-group-item-action my-3">Relatório checkout</a>
                   </ul>
                 </div>
               </div>

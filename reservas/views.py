@@ -1599,10 +1599,14 @@ def lista_alterar_orcamento(request):
             Q(cliente__nome__icontains=termo_cliente) | Q(cliente__telefone__icontains=termo_cliente) | Q(cliente__obs__icontains=termo_cliente) | Q(acomodacao__nome__icontains=termo_cliente), eliminado=False
         ).exclude(
             status="contrato gerado"
+        ).exclude(
+            eliminado=True
         ).order_by("-id")
     else:
         orcamentos = Orcamento.objects.all().exclude(
             status="contrato gerado", eliminado=False
+        ).exclude(
+            eliminado=True
         ).order_by("-id")
     if len(orcamentos) == 0:
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
@@ -2183,3 +2187,433 @@ def lista_relatorio_reservas(request):
     orcamentos = paginator.get_page(page)
     orcamentos_saldos = zip(orcamentos, saldos)
     return render(request, "lista_relatorio_reservas.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
+
+@login_required(login_url="login")
+def visualizar_relatorio_financeiro(request, id):
+    orcamento = Orcamento.objects.get(id=id)
+    pag = Lancamentos.objects.all().filter(
+        orcamento=orcamento, tipo="pagamento"
+    )
+    extras = Lancamentos.objects.all().filter(
+        orcamento=orcamento, tipo="acréscimo"
+    )
+    tot_pag = 0
+    tot_extra = 0
+    saldo = 0
+    for p in pag:
+        tot_pag += p.valor
+
+    for e in extras: 
+        tot_extra += e.valor
+    saldo = orcamento.total_valor_reserva + tot_extra - tot_pag
+    valor_diarias = (orcamento.n_dias-orcamento.dias_pacote)*orcamento.valor_diaria
+    buffer = io.BytesIO()
+    ## fontes do report lab
+    #Courier
+    bold1 = "Courier-Bold"
+    bold2 = "Courier-BoldOblique"
+    #Courier-Oblique
+    padr = "Helvetica" #padrão
+    padr_bold = "Helvetica-Bold"   #padrão
+    bold4 = "Helvetica-BoldOblique"
+    #Helvetica-Oblique
+    #Symbol
+    bold5 = "Times-Bold"
+    #Times-BoldItalic
+    #Times-Italic
+    #Times-Roman
+    #ZapfDingbats
+
+    #Início código
+
+    n_orçamento=f"{orcamento.id}"
+    hospede = f"{orcamento.cliente}"
+    empreendimento= f"{orcamento.acomodacao.empreendimento}"
+    acomodação = f"{orcamento.acomodacao}"
+    entrada = f"{datetime.strftime(orcamento.data_entrada, '%d/%m/%Y')} - {orcamento.dia_entrada} - {orcamento.checkin}"
+    saída =  f"{datetime.strftime(orcamento.data_saida, '%d/%m/%Y')} - {orcamento.dia_saida} - {orcamento.checkout}"
+    tot_diárias =f"{orcamento.n_dias}"
+    tot_ocupantes= f"{orcamento.n_ocupantes}"
+    obs_ocupantes=f"{orcamento.obs_n_ocupantes}"
+    perido = f"{orcamento.periodo}"
+    if orcamento.diaria_cheia:
+        tipo_diária="DIÁRIA CHEIA"
+    else:
+        tipo_diária="PERNOITE"
+    valor_diaria=f"R$ {orcamento.valor_diaria:.2f}"
+    tx_limpeza=  f"R$ {orcamento.taxa_limpeza:.2f}"
+    valor_pacote=f"R$ {orcamento.valor_pacote:.2f}"
+    dias_pacote=f"{orcamento.dias_pacote}"
+    tot_valor_diarias=f"{valor_diarias:.2f}"
+    tot_valor_pacote=f"{orcamento.valor_pacote}"
+    tot_tx_limpeza=f"{orcamento.taxa_limpeza}"
+    tot_acrescimo=f"{orcamento.acrescimos}"
+    tot_desconto=f"{orcamento.descontos}"
+    total_valor=f"{orcamento.total_valor_reserva}"
+
+    if orcamento.modificado:
+        modificado = "***Modificado"
+        motivo = f"Motivo: {orcamento.obs_modificacao}"
+    else:
+        modificado = ""
+        motivo = ""
+    #condições de pagamento
+    ##### inicio do projeto ########
+
+    #transforma mm em pontos
+    def mm2p(mm):
+        return mm/0.352777
+    ## gera nome do arquivo personalizado para cada cliente
+    cliente = hospede.replace("(","-").replace(")","-").replace("/","-")
+    arquivo = f"{n_orçamento}-{acomodação} {cliente}.pdf"
+    cnv =  canvas.Canvas(buffer, pagesize=A4)
+
+    cnv.setTitle(f"Resumo financeiro do orçamento {orcamento.id} de {hospede} - {acomodação}")
+
+    #desenhar um retangulo informa x inicial, y inicial , largura e altura
+    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+
+    ##### fazendo um cabeçalho ######
+    #desenhar um retangulo para cabeçalho
+    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+    #desenhar uma imagem
+    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+    cnv.setFontSize(15)
+    cnv.setFont(padr_bold,15)
+    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+    cnv.setFontSize(18)
+
+    cnv.setFillColor("green")
+    cnv.drawCentredString(320,780,"DADOS FINANCEIROS DA RESERVA")
+    cnv.setFillColor('red')
+    cnv.setFont(padr_bold,14)
+    cnv.drawCentredString(320,750, empreendimento)
+    cnv.setFillColor('black')
+
+    cnv.setFillColor('blue')
+    cnv.setFont(padr_bold,10)
+    #cnv.drawCentredString(320,750,"NÚMERO DO ORÇAMENTO: ")
+    cnv.drawRightString(500,713,"CONTRATO Nº: ")
+    cnv.setFillColor('black')
+    cnv.setFont(padr,13)
+    cnv.drawRightString(570,713, n_orçamento)
+    cnv.setFillColor('black')
+
+
+    #linha 1
+    linha=243
+    desconto =  5
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"HÓSPEDE:")
+    cnv.setFont(padr,12)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(24),mm2p(linha),hospede)
+
+    #linha 2
+    linha = linha-desconto
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"ACOMODAÇÃO:")
+    cnv.setFont(padr,12)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(33),mm2p(linha),acomodação)
+
+    #linha 3
+    linha = linha-desconto
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"DATA DE ENTRADA(check in):")
+    cnv.setFont(padr,12)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(60),mm2p(linha),entrada)
+
+    #linha 4
+    linha = linha-desconto
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"DATA DE SAÍDA(check out):")
+    cnv.setFont(padr,12)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(60),mm2p(linha),saída)
+
+    cnv.rect(mm2p(2),mm2p(linha-4),mm2p(205),mm2p(0))
+
+    #linha 5  TOTAL DE  DIÁRIA, OCUPANTES E TIPO DE DIÁRIA
+    linha = linha-desconto-6
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"TOTAL DE DIÁRIAS:")
+    cnv.setFont(padr,18)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(39),mm2p(linha),tot_diárias)
+
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(50),mm2p(linha),"TOTAL DE OCUPANTES:")
+    cnv.setFont(padr,18)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(96),mm2p(linha),tot_ocupantes)
+    cnv.setFont(padr,10)
+    cnv.drawString(mm2p(105),mm2p(linha),obs_ocupantes)
+    cnv.setFillColor("green")
+    cnv.setFont(padr_bold,7)
+    cnv.drawRightString(mm2p(205),mm2p(linha-1),tipo_diária)
+    cnv.drawRightString(mm2p(205),mm2p(linha+4),perido)
+    cnv.setFont(padr,10)
+
+    cnv.rect(mm2p(2),mm2p(linha-4),mm2p(205),mm2p(0))
+
+    # linha 6 - VALORES  INDIVIDUAIS
+    linha = linha-desconto-6
+    fonte_destaque=14      
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"VALOR DA DIÁRIA:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(39),mm2p(linha),valor_diaria)
+
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(100),mm2p(linha),"TX DE LIMPEZA:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(150),mm2p(linha),tx_limpeza)
+    cnv.setFont(padr,10)
+
+    #LINHA7
+    linha = linha-desconto-2
+
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha),"VALOR DO PACOTE:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(39),mm2p(linha),valor_pacote)
+
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(100),mm2p(linha)," QUANTIDADE DIAS DO PACOTE:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(160),mm2p(linha),dias_pacote)
+    cnv.setFont(padr,10)
+
+    cnv.rect(mm2p(2),mm2p(linha-4),mm2p(205),mm2p(0))
+
+    ## grade do calculo do orçamento
+    cnv.rect(mm2p(2),mm2p(linha-45),mm2p(80),mm2p(41))
+    cnv.rect(mm2p(2),mm2p(linha-45),mm2p(205),mm2p(41))
+
+    #coluna de CALCULO DO ORÇAMENTO
+    size_calculo = 12
+    linha_coluna_calculo = linha-desconto-4
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"CALCULO DO ORÇAMENTO:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto-2
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"Total das diárias ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), tot_valor_diarias)
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"Valor do Pacote  ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), tot_valor_pacote)
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"Taxa de Limpeza ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), tot_tx_limpeza)
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"Acréscimos ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), tot_acrescimo)
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"Descontos ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("red")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), tot_desconto)
+    cnv.setFillColor("black")
+
+    linha_coluna_calculo = linha_coluna_calculo-desconto
+    cnv.setFont(padr_bold,11)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_coluna_calculo),"TOTAL ==> ")
+    cnv.setFont(padr_bold,size_calculo+3)
+    cnv.setFillColor("black")
+    cnv.drawRightString(mm2p(65),mm2p(linha_coluna_calculo), total_valor)
+    cnv.setFillColor("black")
+
+    # total de lançamentos financeiros
+
+    size_calculo = 12
+    linha_lanc = linha-desconto-4
+    col_lanc = mm2p(85)
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(col_lanc,mm2p(linha_lanc),"TOTAL DE LANÇAMENTOS FINANCEIROS :")
+    cnv.setFont(padr,3)
+    cnv.setFillColor("black")
+
+    linha_lanc=linha_lanc-6
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("black")
+    cnv.drawString(col_lanc,mm2p(linha_lanc),"Total de Extras Registrados ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(col_lanc+300,mm2p(linha_lanc), f"R$ {tot_extra:.2f}")
+
+    linha_lanc=linha_lanc-6
+    cnv.setFont(padr_bold,8)
+    cnv.setFillColor("black")
+    cnv.drawString(col_lanc,mm2p(linha_lanc),"Total de pagamentos Registrados ==> ")
+    cnv.setFont(padr,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawRightString(col_lanc+300,mm2p(linha_lanc), f"R$ {tot_pag:.2f}")
+
+    linha_lanc=linha_lanc-12
+    cnv.setFont(padr_bold,12)
+    cnv.setFillColor("black")
+    cnv.drawString(col_lanc,mm2p(linha_lanc),"SALDO A PAGAR ==> ")
+    cnv.setFont(padr_bold,20)
+    cnv.setFillColor("red")
+    cnv.drawRightString(col_lanc+300,mm2p(linha_lanc), f"R$ {saldo:.2f}")
+
+
+
+    #lançamento de extras
+    size_calculo = 12
+    linha_f_pagto = linha_coluna_calculo-9
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha_f_pagto),"LANÇAMENTOS DE COBRANÇAS EXTRAS:")
+
+    """extras = [
+        {"data":"25/07/2023", "valor":30.00 , "descricao": "consumo ar condiconado 10 kw x R$ 3,00"},
+        {"data":"24/07/2023", "valor":15.50 , "descricao": "1 bomboma de agua mineral"},
+        {"data":"22/07/2023", "valor":54.50 , "descricao": "vaga extra no estacionamento"},
+    ]"""
+    linha_extras = linha_f_pagto - 6
+    cnv.setFont(padr_bold,size_calculo-3)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_extras),"Data Lançamento")
+    cnv.drawString(mm2p(33),mm2p(linha_extras),"Valor")
+    cnv.drawString(mm2p(53),mm2p(linha_extras),"Descrição")
+
+    #tot_extra = 0
+    linha_pos = linha_extras-4
+    cnv.setFont(padr,size_calculo-5)
+    cnv.setFillColor("black")
+    for e in extras:
+        cnv.drawString(mm2p(3),mm2p(linha_pos),datetime.strftime(e.data_lancamento, "%d/%m/%Y"))
+        cnv.drawString(mm2p(33),mm2p(linha_pos),f'R$ {e.valor:.2f}')
+        cnv.drawString(mm2p(53),mm2p(linha_pos),e.descricao)
+        linha_pos+= -3
+    cnv.setFont(padr_bold,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(3),mm2p(linha_pos-4),"Total de cobrança de Extras ===>")
+    cnv.drawString(mm2p(75),mm2p(linha_pos-4),f"R$ {tot_extra:.2f}")
+
+
+    cnv.rect(mm2p(2),mm2p(linha_f_pagto-50),mm2p(205),mm2p(0))
+
+
+
+    ####  pagamentos efetuados ######
+    linha_info = linha_f_pagto-55
+    cnv.setFont(padr_bold,10)
+    cnv.setFillColor("red")
+    cnv.drawString(mm2p(3),mm2p(linha_info),"LANÇAMENTOS DOS PAGAMENTOS EFETUADOS:")
+    cnv.setFont(padr,fonte_destaque)
+    cnv.setFillColor("black")
+
+    linha_pag = linha_info - 6
+    cnv.setFont(padr_bold,size_calculo-3)
+    cnv.setFillColor("blue")
+    cnv.drawString(mm2p(3),mm2p(linha_pag),"Data Lançamento")
+    cnv.drawString(mm2p(33),mm2p(linha_pag),"Valor")
+    cnv.drawString(mm2p(53),mm2p(linha_pag),"Descrição")
+
+    """pagamentos = [
+        {"data":"22/07/2023", "valor":1030.00 , "descricao": "deposito conta PJ inter"},
+        {"data":"24/07/2023", "valor":150.00 , "descricao": "depósito conta brsdesco"},
+        {"data":"27/07/2023", "valor":100.00 , "descricao": "pagamento em dinheiro"},
+    ]"""
+
+    linha_pos = linha_pag-4
+    cnv.setFont(padr,size_calculo-5)
+    cnv.setFillColor("black")
+    #tot_pag = 0
+    for e in pag:
+        cnv.drawString(mm2p(3),mm2p(linha_pos),datetime.strftime(e.data_lancamento, "%d/%m/%Y"))
+        cnv.drawString(mm2p(33),mm2p(linha_pos),f'R$ {e.valor:.2f}')
+        cnv.drawString(mm2p(53),mm2p(linha_pos),e.descricao)
+        linha_pos+= -3
+
+    cnv.setFont(padr_bold,size_calculo)
+    cnv.setFillColor("black")
+    cnv.drawString(mm2p(3),mm2p(linha_pos-4),"Total de Pagamentos Registrados ===>")
+    cnv.drawString(mm2p(90),mm2p(linha_pos-4),f"R$ {tot_pag:.2f}")
+
+    cnv.setFont(padr, 7)
+    cnv.drawRightString(mm2p(200), mm2p(7), modificado)
+    cnv.drawRightString(mm2p(200), mm2p(5), motivo)
+    cnv.showPage()
+    cnv.save()
+    #Fim código
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=False, filename=arquivo)
+
+@login_required(login_url="login")
+def lista_checkout(request):
+    data_inicial = request.POST.get("data_inicial")
+    data_final = request.POST.get("data_final")
+    if not data_inicial or not data_final:
+        messages.add_message(request, messages.INFO, "Informe uma data inicial e uma data final")
+        return render(request, "lista_checkout.html")
+    data_inicial = datetime.strptime(data_inicial, "%Y-%m-%d")
+    data_final = datetime.strptime(data_final, "%Y-%m-%d")
+    if data_final < data_inicial:
+        messages.add_message(request, messages.ERROR, "Data final não pode ser menor que a data inicial")
+        return render(request, "lista_checkout.html")
+    else:
+        orcamentos = Orcamento.objects.all().filter(
+            data_saida__range=(data_inicial, data_final)
+        ).filter(
+            confirmado=True
+        ).exclude(
+            eliminado=True
+        ).order_by("data_saida")
+        datas = []
+        for o in orcamentos:
+            if o.data_saida not in datas:
+                datas.append(o.data_saida)
+        if len(orcamentos) == 0:
+            messages.add_message(request, messages.INFO, "Não existe checkout previsto para este intervalo de datas até o momento")
+            return render(request, "lista_checkout.html")
+        else:
+            return render(request, "lista_checkout.html", {"orcamentos": orcamentos, "datas": datas})
