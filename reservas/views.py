@@ -2660,8 +2660,11 @@ def pdf_checkout(request,):
         return mm/0.352777
     ## gera nome do arquivo personalizado para cada cliente
     arquivo = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}.pdf"
+    rel = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}."
     cnv =  canvas.Canvas(buffer, pagesize=A4)
-
+    hoje = datetime.now()
+    hoje = datetime.strftime(hoje,'%d/%m/%Y %H:%M:%S')
+    
     cnv.setTitle(f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}")
 
     #desenhar um retangulo informa x inicial, y inicial , largura e altura
@@ -2670,6 +2673,7 @@ def pdf_checkout(request,):
     ##### fazendo um cabeçalho ######
     #desenhar um retangulo para cabeçalho
     cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+    pagina = 1
     #desenhar uma imagem
     cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
     cnv.setFontSize(15)
@@ -2682,6 +2686,15 @@ def pdf_checkout(request,):
     cnv.setFillColor('red')
     cnv.setFont(padr_bold,14)
 
+    cnv.setFillColor("red")
+    cnv.setFont(padr_bold,10)
+    cnv.drawCentredString(320,750,rel)
+    cnv.setFillColor('black')
+    cnv.setFont(bold4,10)
+    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+    cnv.setFont(padr_bold,14)
+
+
     semana = ("Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado", "Domingo")
 
     linha = mm2p(297-55)
@@ -2690,17 +2703,55 @@ def pdf_checkout(request,):
         cnv.setFillColor("red")
         cnv.drawString(10,linha,f"Data: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
         cnv.setFillColor("black")
+        cab=True
         for o in orcamentos:
+            if linha<100:
+                pagina+=1
+                cnv.setFont(padr,7)
+                cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                cnv.showPage()
+                linha = mm2p(297-55)
+                cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                #desenhar uma imagem
+                cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                cnv.setFontSize(15)
+                cnv.setFont(padr_bold,15)
+                cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                cnv.setFontSize(18)
+
+                cnv.setFillColor("green")
+                cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKOUTS")
+                cnv.setFillColor('red')
+                cnv.setFont(padr_bold,14)
+
+                cnv.setFillColor("red")
+                cnv.setFont(padr_bold,10)
+                cnv.drawCentredString(320,750,rel)
+                cnv.setFillColor('black')
+                cnv.setFont(bold4,10)
+                cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                cnv.setFont(padr_bold,14)
             if o.data_saida == d:
-                cnv.setFontSize(8)
+                if cab:
+                    cnv.setFontSize(11)
+                    cnv.setFillColor("green")
+                    cnv.drawString(10,linha-12, f"Acomodação")
+                    cnv.drawString(180,linha-12, f"Cliente:")
+                    cnv.drawRightString(550,linha-12, f"limite de horário para saída")
+                    linha -= 12
+                    cnv.setFillColor("black")
+                cab=False
+                cnv.setFontSize(10)
                 cnv.drawString(10,linha-12, f"{o.acomodacao}")
-                cnv.drawString(150,linha-12, f"{o.cliente}")
+                cnv.setFontSize(8)
+                cnv.drawString(180,linha-12, f"{o.cliente}")
                 cnv.drawRightString(550,linha-12, f"{o.checkout}")
                 linha -= 12
+        cab=True
         linha -= 12
         cnv.line(10, linha, 585, linha)
         linha -= 24
-
     cnv.showPage()
     cnv.save()
     #Fim código
