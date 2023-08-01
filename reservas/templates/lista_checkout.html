@@ -37,9 +37,14 @@ Relatório checkout
           <div class="col-sm-4">
             <br>
             <button class="btn btn-primary mt-2" type="submit">Pesquisa</button>
+            {% if datas %}
+            <a class="btn btn-outline-primary mx-3 mt-2" target="_blank" href="{% url 'pdf_checkout'%}?data_inicial={{request.POST.data_inicial}}&data_final={{request.POST.data_final}}">Imprimir/gerar PDF</a>
+            {% endif %}
           </div>
         </div>
     </form>
+
+    
 
     {% for d in datas %}
     <div class="col-12 table-responsive mb-5">

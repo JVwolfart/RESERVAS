@@ -2617,3 +2617,95 @@ def lista_checkout(request):
             return render(request, "lista_checkout.html")
         else:
             return render(request, "lista_checkout.html", {"orcamentos": orcamentos, "datas": datas})
+        
+@login_required(login_url="login")
+def pdf_checkout(request,):
+    data_inicial = request.GET.get("data_inicial")
+    data_final = request.GET.get("data_final")
+    data_inicial = datetime.strptime(data_inicial, "%Y-%m-%d")
+    data_final = datetime.strptime(data_final, "%Y-%m-%d")
+    orcamentos = Orcamento.objects.all().filter(
+        data_saida__range=(data_inicial, data_final)
+    ).filter(
+        confirmado=True
+    ).exclude(
+        eliminado=True
+    ).order_by("data_saida")
+    datas = []
+    for o in orcamentos:
+        if o.data_saida not in datas:
+            datas.append(o.data_saida)
+    buffer = io.BytesIO()
+    ## fontes do report lab
+    #Courier
+    bold1 = "Courier-Bold"
+    bold2 = "Courier-BoldOblique"
+    #Courier-Oblique
+    padr = "Helvetica" #padrão
+    padr_bold = "Helvetica-Bold"   #padrão
+    bold4 = "Helvetica-BoldOblique"
+    #Helvetica-Oblique
+    #Symbol
+    bold5 = "Times-Bold"
+    #Times-BoldItalic
+    #Times-Italic
+    #Times-Roman
+    #ZapfDingbats
+
+
+    ##### inicio do projeto ########
+
+    #transforma mm em pontos
+    def mm2p(mm):
+        return mm/0.352777
+    ## gera nome do arquivo personalizado para cada cliente
+    arquivo = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}.pdf"
+    cnv =  canvas.Canvas(buffer, pagesize=A4)
+
+    cnv.setTitle(f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}")
+
+    #desenhar um retangulo informa x inicial, y inicial , largura e altura
+    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+
+    ##### fazendo um cabeçalho ######
+    #desenhar um retangulo para cabeçalho
+    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+    #desenhar uma imagem
+    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+    cnv.setFontSize(15)
+    cnv.setFont(padr_bold,15)
+    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+    cnv.setFontSize(18)
+
+    cnv.setFillColor("green")
+    cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKOUTS")
+    cnv.setFillColor('red')
+    cnv.setFont(padr_bold,14)
+
+    semana = ("Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado", "Domingo")
+
+    linha = mm2p(297-55)
+    for d in datas:
+        cnv.setFontSize(15)
+        cnv.setFillColor("red")
+        cnv.drawString(10,linha,f"Data: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
+        cnv.setFillColor("black")
+        for o in orcamentos:
+            if o.data_saida == d:
+                cnv.setFontSize(8)
+                cnv.drawString(10,linha-12, f"{o.acomodacao}")
+                cnv.drawString(150,linha-12, f"{o.cliente}")
+                cnv.drawRightString(550,linha-12, f"{o.checkout}")
+                linha -= 12
+        linha -= 12
+        cnv.line(10, linha, 585, linha)
+        linha -= 24
+
+    cnv.showPage()
+    cnv.save()
+    #Fim código
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=False, filename=arquivo)
