@@ -1,0 +1,91 @@
+{% extends 'base.html'%}
+{% load static %}
+
+{% block 'titulo'%}
+Relatório checkin
+{% endblock%}
+
+
+
+{% block 'conteudo'%}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home'%}">Página Inicial</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Relatório checkin</li>
+  </ol>
+</nav>
+
+<h1 style="padding-top: 20px;" class="text-center text-primary">Relatório checkin</h1>
+{% include 'parciais/_messages.html'%}
+
+<div class="col-12">
+
+    <form action="{% url 'lista_checkin' %}" method="post">
+      {% csrf_token %}
+        <div class="row">
+          <div class="col-sm-4">
+            <label class="form-label">Data inicial</label>
+            <input class="form-control me-2" type="date" placeholder="Data inicial" aria-label="Search" name="data_inicial" value="{{request.POST.data_inicial}}">
+          </div>
+
+
+          <div class="col-sm-4">
+            <label class="form-label">Data final</label>
+            <input class="form-control me-2" type="date" placeholder="Data final" aria-label="Search" name="data_final" value="{{request.POST.data_final}}">
+          </div>
+
+          <div class="col-sm-4">
+            <br>
+            <button class="btn btn-primary mt-2" type="submit">Pesquisa</button>
+            {% if datas %}
+            <a class="btn btn-outline-primary mx-3 mt-2" target="_blank" href="{% url 'pdf_checkin'%}?data_inicial={{request.POST.data_inicial}}&data_final={{request.POST.data_final}}">Imprimir/gerar PDF</a>
+            {% endif %}
+          </div>
+        </div>
+    </form>
+
+    
+
+    {% for d in datas %}
+    <div class="col-12 table-responsive mb-5">
+      
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Data entrada</th>
+              <th scope="col">Dia entrada</th>
+              <th scope="col">Cliente</th>
+              <th scope="col">Acomodação</th>
+              <th scope="col">Hora limite para checkin</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in orcamentos%}
+            {%if o.data_entrada == d %}
+            <tr>
+                <td>{{o.data_entrada}}</td>
+                <td>{{o.dia_entrada}}</td>
+                <td class="">{{o.cliente}}</td>
+                <td class="">{{o.acomodacao}}</td>
+                <td class="">{{o.checkin}}</td>
+            </tr>
+            {% else %}
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+  </div>
+  {% endfor %}
+</div>
+
+
+<div class="row">
+    <div style="height: 400px; text-align: center;">
+      <img src="{% static 'img/logo1.png'%}" alt="" class="image-fluid mt-5" style="height: 300px; margin: 0 auto;">
+    </div>
+</div>
+
+<div class="row">
+</div>
+
+{% endblock %}

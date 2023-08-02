@@ -50,4 +50,8 @@ urlpatterns = [
     path('visualizar_relatorio_financeiro/<int:id>', views.visualizar_relatorio_financeiro, name="visualizar_relatorio_financeiro"),
     path('lista_checkout/', views.lista_checkout, name="lista_checkout"),
     path('pdf_checkout/', views.pdf_checkout, name="pdf_checkout"),
+    path('lista_checkin/', views.lista_checkin, name="lista_checkin"),
+    path('pdf_checkin/', views.pdf_checkin, name="pdf_checkin"),
+    path('lista_reservas/', views.lista_reservas, name="lista_reservas"),
+    path('pdf_reservas/', views.pdf_reservas, name="pdf_reservas"),
 ]
