@@ -37,7 +37,7 @@ Relatório checkin/checkout
           <div class="col-sm-4">
             <br>
             <button class="btn btn-primary mt-2" type="submit">Pesquisa</button>
-            {% if datas %}
+            {% if ndatas %}
             <a class="btn btn-outline-primary mx-3 mt-2" target="_blank" href="{% url 'pdf_reservas'%}?data_inicial={{request.POST.data_inicial}}&data_final={{request.POST.data_final}}">Imprimir/gerar PDF</a>
             {% endif %}
           </div>
@@ -46,7 +46,7 @@ Relatório checkin/checkout
 
     
 
-    {% for d in datas %}
+    {% for d in ndatas %}
     <hr>
     <hr>
     <h2 class="text-success">Dia {{d}} - {{d | date:"l"}}</h2>
@@ -83,7 +83,7 @@ Relatório checkin/checkout
   
 
   {% else %}
-  <h3 class="text-danger">Sem saídas programadas para esse dia</h3>
+  <h3 class="text-danger">Sem saídas programadas para o dia {{d}} - {{d | date:"l"}}</h3>
   {% endif %}
 
   {% if d in datas_entrada %}
@@ -118,7 +118,7 @@ Relatório checkin/checkout
   </div>
 
   {% else %}
-  <h3 class="text-danger">Sem entradas programadas para esse dia</h3>
+  <h3 class="text-danger">Sem entradas programadas para o dia {{d}} - {{d | date:"l"}}</h3>
   {% endif %}
 
   {% endfor %}

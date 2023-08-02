@@ -2659,7 +2659,7 @@ def pdf_checkout(request):
     def mm2p(mm):
         return mm/0.352777
     ## gera nome do arquivo personalizado para cada cliente
-    arquivo = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}.pdf"
+    arquivo = f"Programação de limpezas do dia {data_inicial.date()} até o dia {data_final.date()}.pdf"
     rel = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}."
     cnv =  canvas.Canvas(buffer, pagesize=A4)
     hoje = datetime.now()
@@ -2833,13 +2833,13 @@ def pdf_checkin(request):
     def mm2p(mm):
         return mm/0.352777
     ## gera nome do arquivo personalizado para cada cliente
-    arquivo = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}.pdf"
-    rel = f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}."
+    arquivo = f"Programação de Revisão de limpezas do dia {data_inicial.date()} até o dia {data_final.date()}.pdf"
+    rel = f"Programação de Revisão de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}."
     cnv =  canvas.Canvas(buffer, pagesize=A4)
     hoje = datetime.now()
     hoje = datetime.strftime(hoje,'%d/%m/%Y %H:%M:%S')
     
-    cnv.setTitle(f"Programação de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}")
+    cnv.setTitle(f"Programação de Revisão de limpezas do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}")
 
     #desenhar um retangulo informa x inicial, y inicial , largura e altura
     cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
@@ -2962,6 +2962,16 @@ def lista_reservas(request):
     ).exclude(
         eliminado=True
     ).order_by("data_saida")
+    quant_dias = abs((data_inicial - data_final).days)
+    ndatas = []    
+    for i in range(0,quant_dias+1):
+        dia = data_inicial + timedelta(days=i)
+        dia = dia.strftime("%Y-%m-%d")
+        dia = datetime.strptime(dia,"%Y-%m-%d")
+        print(dia.date())
+        ndatas.append(dia.date())
+
+
     datas_entrada = []
     datas_saida = []
     datas = []
@@ -2976,7 +2986,9 @@ def lista_reservas(request):
         if o.data_saida not in datas_saida:
             datas_saida.append(o.data_saida)
     datas = sorted(datas)
-    return render(request, "lista_checkin_checkout.html", {"datas": datas, "orcamentos_entrada": orcamentos_entrada, "orcamentos_saida": orcamentos_saida, "datas_entrada": datas_entrada, "datas_saida": datas_saida})
+    print(datas)
+    print(ndatas)
+    return render(request, "lista_checkin_checkout.html", {"ndatas":ndatas, "datas": datas, "orcamentos_entrada": orcamentos_entrada, "orcamentos_saida": orcamentos_saida, "datas_entrada": datas_entrada, "datas_saida": datas_saida})
 
 @login_required(login_url="login")
 def pdf_reservas(request):
@@ -3005,6 +3017,14 @@ def pdf_reservas(request):
     ).exclude(
         eliminado=True
     ).order_by("data_saida")
+    quant_dias = abs((data_inicial - data_final).days)
+    ndatas = []    
+    for i in range(0,quant_dias+1):
+        dia = data_inicial + timedelta(days=i)
+        dia = dia.strftime("%Y-%m-%d")
+        dia = datetime.strptime(dia,"%Y-%m-%d")
+        print(dia.date())
+        ndatas.append(dia.date())
     datas_entrada = []
     datas_saida = []
     datas = []
@@ -3043,7 +3063,7 @@ def pdf_reservas(request):
     def mm2p(mm):
         return mm/0.352777
     ## gera nome do arquivo personalizado para cada cliente
-    arquivo = f"Relatório das reservas por dia do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}.pdf"
+    arquivo = f"Relatório das reservas por dia do dia {data_inicial.date()} até o dia {data_final.date()}.pdf"
     rel = f"Relatório das reservas por dia do dia {datetime.strftime(data_inicial, '%d/%m/%Y')} até o dia {datetime.strftime(data_final, '%d/%m/%Y')}."
     cnv =  canvas.Canvas(buffer, pagesize=A4)
     hoje = datetime.now()
@@ -3082,7 +3102,7 @@ def pdf_reservas(request):
     semana = ("Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado", "Domingo")
 
     linha = mm2p(297-55)
-    for d in datas:
+    for d in ndatas:
         cnv.setFontSize(15)
         cnv.setFillColor("black")
         cnv.drawString(10,linha,f"Dia {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
@@ -3138,14 +3158,41 @@ def pdf_reservas(request):
                     cnv.drawRightString(550,linha-12, f"{o.checkin}")
                     linha -= 12
             cab=True
-            linha -= 12
+            #linha -= 12
             #cnv.line(10, linha, 585, linha)
             linha -= 24
         else:
+            if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(13)
+
+                    cnv.setFillColor("green")
+                    cnv.drawCentredString(320,780,"RELATÓRIO DAS RESERVAS POR DIA (ENTRADAS/SAÍDAS)")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
             linha -= 12
             cnv.setFontSize(15)
             cnv.setFillColor("red")
-            cnv.drawCentredString(300, linha, "###Sem entradas programadas para esse dia###")
+            cnv.drawCentredString(300, linha, "### Sem entradas programadas para esse dia ###")
             linha -= 24
         
         if d in datas_saida:
@@ -3204,9 +3251,36 @@ def pdf_reservas(request):
             cnv.line(10, linha, 585, linha)
             linha -= 24
         else:
+            if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(13)
+
+                    cnv.setFillColor("green")
+                    cnv.drawCentredString(320,780,"RELATÓRIO DAS RESERVAS POR DIA (ENTRADAS/SAÍDAS)")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
             cnv.setFontSize(15)
             cnv.setFillColor("red")
-            cnv.drawCentredString(300, linha, "###Sem saídas programadas para esse dia###")
+            cnv.drawCentredString(300, linha, "### Sem saídas programadas para esse dia ###")
             linha -= 12
             cnv.line(10, linha, 585, linha)
             linha -= 24
