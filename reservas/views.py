@@ -2968,7 +2968,7 @@ def lista_reservas(request):
         dia = data_inicial + timedelta(days=i)
         dia = dia.strftime("%Y-%m-%d")
         dia = datetime.strptime(dia,"%Y-%m-%d")
-        print(dia.date())
+        #print(dia.date())
         ndatas.append(dia.date())
 
 
@@ -2986,8 +2986,8 @@ def lista_reservas(request):
         if o.data_saida not in datas_saida:
             datas_saida.append(o.data_saida)
     datas = sorted(datas)
-    print(datas)
-    print(ndatas)
+    #print(datas)
+    #print(ndatas)
     return render(request, "lista_checkin_checkout.html", {"ndatas":ndatas, "datas": datas, "orcamentos_entrada": orcamentos_entrada, "orcamentos_saida": orcamentos_saida, "datas_entrada": datas_entrada, "datas_saida": datas_saida})
 
 @login_required(login_url="login")
@@ -3023,7 +3023,7 @@ def pdf_reservas(request):
         dia = data_inicial + timedelta(days=i)
         dia = dia.strftime("%Y-%m-%d")
         dia = datetime.strptime(dia,"%Y-%m-%d")
-        print(dia.date())
+        #print(dia.date())
         ndatas.append(dia.date())
     datas_entrada = []
     datas_saida = []
