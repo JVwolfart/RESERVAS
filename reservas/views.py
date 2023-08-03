@@ -2612,11 +2612,20 @@ def lista_checkout(request):
         for o in orcamentos:
             if o.data_saida not in datas:
                 datas.append(o.data_saida)
+
+        quant_dias = abs((data_inicial - data_final).days)
+        ndatas = []    
+        for i in range(0,quant_dias+1):
+            dia = data_inicial + timedelta(days=i)
+            dia = dia.strftime("%Y-%m-%d")
+            dia = datetime.strptime(dia,"%Y-%m-%d")
+            #print(dia.date())
+            ndatas.append(dia.date())
         if len(orcamentos) == 0:
             messages.add_message(request, messages.INFO, "Não existe checkout previsto para este intervalo de datas até o momento")
             return render(request, "lista_checkout.html")
         else:
-            return render(request, "lista_checkout.html", {"orcamentos": orcamentos, "datas": datas})
+            return render(request, "lista_checkout.html", {"orcamentos": orcamentos, "datas": datas, "ndatas": ndatas})
         
 @login_required(login_url="login")
 def pdf_checkout(request):
@@ -2635,6 +2644,14 @@ def pdf_checkout(request):
     for o in orcamentos:
         if o.data_saida not in datas:
             datas.append(o.data_saida)
+    quant_dias = abs((data_inicial - data_final).days)
+    ndatas = []    
+    for i in range(0,quant_dias+1):
+        dia = data_inicial + timedelta(days=i)
+        dia = dia.strftime("%Y-%m-%d")
+        dia = datetime.strptime(dia,"%Y-%m-%d")
+        #print(dia.date())
+        ndatas.append(dia.date())
     buffer = io.BytesIO()
     ## fontes do report lab
     #Courier
@@ -2698,60 +2715,95 @@ def pdf_checkout(request):
     semana = ("Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado", "Domingo")
 
     linha = mm2p(297-55)
-    for d in datas:
-        cnv.setFontSize(15)
-        cnv.setFillColor("red")
-        cnv.drawString(10,linha,f"Saídas programadas para a data de: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
-        cnv.setFillColor("black")
-        cab=True
-        for o in orcamentos:
-            if linha<100:
-                pagina+=1
-                cnv.setFont(padr,7)
-                cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
-                cnv.showPage()
-                linha = mm2p(297-55)
-                cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
-                cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
-                #desenhar uma imagem
-                cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
-                cnv.setFontSize(15)
-                cnv.setFont(padr_bold,15)
-                cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
-                cnv.setFontSize(18)
+    for d in ndatas:
+        if d in datas:
+            cnv.setFontSize(15)
+            cnv.setFillColor("red")
+            cnv.drawString(10,linha,f"Saídas programadas para a data de: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
+            cnv.setFillColor("black")
+            cab=True
+            for o in orcamentos:
+                if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(18)
 
-                cnv.setFillColor("green")
-                cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKOUTS")
-                cnv.setFillColor('red')
-                cnv.setFont(padr_bold,14)
-
-                cnv.setFillColor("red")
-                cnv.setFont(padr_bold,10)
-                cnv.drawCentredString(320,750,rel)
-                cnv.setFillColor('black')
-                cnv.setFont(bold4,10)
-                cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
-                cnv.setFont(padr_bold,14)
-            if o.data_saida == d:
-                if cab:
-                    cnv.setFontSize(11)
                     cnv.setFillColor("green")
-                    cnv.drawString(10,linha-12, f"Acomodação")
-                    cnv.drawString(180,linha-12, f"Cliente:")
-                    cnv.drawRightString(550,linha-12, f"limite de horário para saída")
+                    cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKOUTS")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
+                if o.data_saida == d:
+                    if cab:
+                        cnv.setFontSize(11)
+                        cnv.setFillColor("green")
+                        cnv.drawString(10,linha-12, f"Acomodação")
+                        cnv.drawString(180,linha-12, f"Cliente:")
+                        cnv.drawRightString(550,linha-12, f"limite de horário para saída")
+                        linha -= 12
+                        cnv.setFillColor("black")
+                    cab=False
+                    cnv.setFontSize(10)
+                    cnv.drawString(10,linha-12, f"{o.acomodacao}")
+                    cnv.setFontSize(8)
+                    cnv.drawString(180,linha-12, f"{o.cliente}")
+                    cnv.drawRightString(550,linha-12, f"{o.checkout}")
                     linha -= 12
-                    cnv.setFillColor("black")
-                cab=False
-                cnv.setFontSize(10)
-                cnv.drawString(10,linha-12, f"{o.acomodacao}")
-                cnv.setFontSize(8)
-                cnv.drawString(180,linha-12, f"{o.cliente}")
-                cnv.drawRightString(550,linha-12, f"{o.checkout}")
-                linha -= 12
-        cab=True
-        linha -= 12
-        cnv.line(10, linha, 585, linha)
-        linha -= 24
+            cab=True
+            linha -= 12
+            cnv.line(10, linha, 585, linha)
+            linha -= 24
+        else:
+            if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(13)
+
+                    cnv.setFillColor("green")
+                    cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKOUTS")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
+            cnv.setFontSize(15)
+            cnv.setFillColor("red")
+            cnv.drawCentredString(300, linha, f"### Sem saídas programadas para o dia {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]} ###")
+            linha -= 12
+            cnv.line(10, linha, 585, linha)
+            linha -= 24
     cnv.showPage()
     cnv.save()
     #Fim código
@@ -2785,11 +2837,19 @@ def lista_checkin(request):
         for o in orcamentos:
             if o.data_entrada not in datas:
                 datas.append(o.data_entrada)
+        quant_dias = abs((data_inicial - data_final).days)
+        ndatas = []    
+        for i in range(0,quant_dias+1):
+            dia = data_inicial + timedelta(days=i)
+            dia = dia.strftime("%Y-%m-%d")
+            dia = datetime.strptime(dia,"%Y-%m-%d")
+            #print(dia.date())
+            ndatas.append(dia.date())
         if len(orcamentos) == 0:
             messages.add_message(request, messages.INFO, "Não existe checkin previsto para este intervalo de datas até o momento")
             return render(request, "lista_checkin.html")
         else:
-            return render(request, "lista_checkin.html", {"orcamentos": orcamentos, "datas": datas})
+            return render(request, "lista_checkin.html", {"orcamentos": orcamentos, "datas": datas, "ndatas": ndatas})
         
 
 @login_required(login_url="login")
@@ -2809,6 +2869,14 @@ def pdf_checkin(request):
     for o in orcamentos:
         if o.data_entrada not in datas:
             datas.append(o.data_entrada)
+    quant_dias = abs((data_inicial - data_final).days)
+    ndatas = []    
+    for i in range(0,quant_dias+1):
+        dia = data_inicial + timedelta(days=i)
+        dia = dia.strftime("%Y-%m-%d")
+        dia = datetime.strptime(dia,"%Y-%m-%d")
+        #print(dia.date())
+        ndatas.append(dia.date())
     buffer = io.BytesIO()
     ## fontes do report lab
     #Courier
@@ -2872,60 +2940,95 @@ def pdf_checkin(request):
     semana = ("Segunda Feira", "Terça Feira", "Quarta Feira", "Quinta Feira", "Sexta Feira", "Sábado", "Domingo")
 
     linha = mm2p(297-55)
-    for d in datas:
-        cnv.setFontSize(15)
-        cnv.setFillColor("red")
-        cnv.drawString(10,linha,f"Entradas programadas para a data de: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
-        cnv.setFillColor("black")
-        cab=True
-        for o in orcamentos:
-            if linha<100:
-                pagina+=1
-                cnv.setFont(padr,7)
-                cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
-                cnv.showPage()
-                linha = mm2p(297-55)
-                cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
-                cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
-                #desenhar uma imagem
-                cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
-                cnv.setFontSize(15)
-                cnv.setFont(padr_bold,15)
-                cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
-                cnv.setFontSize(18)
+    for d in ndatas:
+        if d in datas:
+            cnv.setFontSize(15)
+            cnv.setFillColor("red")
+            cnv.drawString(10,linha,f"Entradas programadas para a data de: {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]}")
+            cnv.setFillColor("black")
+            cab=True
+            for o in orcamentos:
+                if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(18)
 
-                cnv.setFillColor("green")
-                cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKINS")
-                cnv.setFillColor('red')
-                cnv.setFont(padr_bold,14)
-
-                cnv.setFillColor("red")
-                cnv.setFont(padr_bold,10)
-                cnv.drawCentredString(320,750,rel)
-                cnv.setFillColor('black')
-                cnv.setFont(bold4,10)
-                cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
-                cnv.setFont(padr_bold,14)
-            if o.data_entrada == d:
-                if cab:
-                    cnv.setFontSize(11)
                     cnv.setFillColor("green")
-                    cnv.drawString(10,linha-12, f"Acomodação")
-                    cnv.drawString(180,linha-12, f"Cliente:")
-                    cnv.drawRightString(550,linha-12, f"limite de horário para entrada")
+                    cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKINS")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
+                if o.data_entrada == d:
+                    if cab:
+                        cnv.setFontSize(11)
+                        cnv.setFillColor("green")
+                        cnv.drawString(10,linha-12, f"Acomodação")
+                        cnv.drawString(180,linha-12, f"Cliente:")
+                        cnv.drawRightString(550,linha-12, f"limite de horário para entrada")
+                        linha -= 12
+                        cnv.setFillColor("black")
+                    cab=False
+                    cnv.setFontSize(10)
+                    cnv.drawString(10,linha-12, f"{o.acomodacao}")
+                    cnv.setFontSize(8)
+                    cnv.drawString(180,linha-12, f"{o.cliente}")
+                    cnv.drawRightString(550,linha-12, f"{o.checkin}")
                     linha -= 12
-                    cnv.setFillColor("black")
-                cab=False
-                cnv.setFontSize(10)
-                cnv.drawString(10,linha-12, f"{o.acomodacao}")
-                cnv.setFontSize(8)
-                cnv.drawString(180,linha-12, f"{o.cliente}")
-                cnv.drawRightString(550,linha-12, f"{o.checkin}")
-                linha -= 12
-        cab=True
-        linha -= 12
-        cnv.line(10, linha, 585, linha)
-        linha -= 24
+            cab=True
+            linha -= 12
+            cnv.line(10, linha, 585, linha)
+            linha -= 24
+        else:
+            if linha<100:
+                    pagina+=1
+                    cnv.setFont(padr,7)
+                    cnv.drawCentredString(320,20,f"Continua na Página {pagina}")
+                    cnv.showPage()
+                    linha = mm2p(297-55)
+                    cnv.rect(mm2p(2),mm2p(2),mm2p(205),mm2p(293))
+                    cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
+                    #desenhar uma imagem
+                    cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
+                    cnv.setFontSize(15)
+                    cnv.setFont(padr_bold,15)
+                    cnv.drawCentredString(320,810,"RESIDENCIAL SOL DE VERÃO & MORADAS PÉ NA AREIA")
+                    cnv.setFontSize(13)
+
+                    cnv.setFillColor("green")
+                    cnv.drawCentredString(320,780,"PROGRAMAÇÃO DE CHECKINS")
+                    cnv.setFillColor('red')
+                    cnv.setFont(padr_bold,14)
+
+                    cnv.setFillColor("red")
+                    cnv.setFont(padr_bold,10)
+                    cnv.drawCentredString(320,750,rel)
+                    cnv.setFillColor('black')
+                    cnv.setFont(bold4,10)
+                    cnv.drawCentredString(320,720,f"Relatório Gerado em {hoje}  ===> Pagina {pagina}")
+                    cnv.setFont(padr_bold,14)
+            cnv.setFontSize(15)
+            cnv.setFillColor("red")
+            cnv.drawCentredString(300, linha, f"### Sem entradas programadas para o dia {datetime.strftime(d, '%d/%m/%Y')} {semana[d.weekday()]} ###")
+            linha -= 12
+            cnv.line(10, linha, 585, linha)
+            linha -= 24
     cnv.showPage()
     cnv.save()
     #Fim código
