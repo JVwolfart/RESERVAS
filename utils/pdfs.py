@@ -628,6 +628,8 @@ def gera_relatorio_financeiro(orcamento, pag, extras):
     else:
         modificado = ""
         motivo = ""
+    
+
     cliente = hospede.replace("(","-").replace(")","-").replace("/","-")
     arquivo = f"{n_orçamento}-{acomodação} {cliente}.pdf"
     cnv =  canvas.Canvas(buffer, pagesize=A4)
@@ -641,6 +643,15 @@ def gera_relatorio_financeiro(orcamento, pag, extras):
     #desenhar um retangulo para cabeçalho
     cnv.rect(mm2p(2),mm2p(250),mm2p(205),mm2p(45))
     #desenhar uma imagem
+    if orcamento.quitado:
+        cnv.setFontSize(40)
+        cnv.setFont(padr_bold,40)
+        cnv.rotate(40)
+        cnv.setFillColor("green",alpha=0.1)
+        cnv.drawString(400,200,"P A G O ")
+        cnv.drawString(250,100,"ORÇAMENTO QUITADO")
+        cnv.rotate(-40)
+        cnv.setFillColor("black",alpha=1)
     cnv.drawImage("templates/static/img/LOGO.png",mm2p(3),mm2p(251),width=mm2p(30),height=mm2p(40))
     cnv.setFontSize(15)
     cnv.setFont(padr_bold,15)

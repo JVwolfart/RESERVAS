@@ -979,7 +979,8 @@ def lista_orcamentos_quitados(request):
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
-    saldos = saldos[10*(int(page)-1):]
+    if page:
+        saldos = saldos[10*(int(page)-1):]
     orcamentos = paginator.get_page(page)
     orcamentos_saldos = zip(orcamentos, saldos)
     return render(request, "lista_orcamentos_quitados.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
