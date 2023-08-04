@@ -36,7 +36,7 @@ Orçamentos para geração de PDF
                 <td>{{o.id}}</td>
                 <td class="">{{o}}</td>
                 <td class="">{{o.status}}</td>
-                <td><a href="{% url 'gera_pdf_orc' o.id%}" target="_blank" class="btn" title="Gerar PDF"><i class="fa-regular fa-file-pdf fa-spin-pulse text-primary"></i></i>Gerar PDF do orçamento</a></td>
+                <td><a href="{% url 'vizualizar_pdf' o.id%}" target="_blank" class="btn" title="Gerar PDF"><i class="fa-regular fa-file-pdf fa-spin-pulse text-primary"></i></i>Gerar PDF do orçamento</a></td>
             </tr>
             {% endfor %}
           </tbody>
