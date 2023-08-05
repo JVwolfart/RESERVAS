@@ -755,7 +755,8 @@ def lista_confirmar_orcamento(request):
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
-    saldos = saldos[10*(int(page)-1):]
+    if page:
+        saldos = saldos[10*(int(page)-1):]
     orcamentos = paginator.get_page(page)
     orcamentos_saldos = zip(orcamentos, saldos)
     return render(request, "lista_confirmar_orcamento.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
@@ -921,7 +922,8 @@ def lista_orcamentos_confirmados(request):
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
-    saldos = saldos[10*(int(page)-1):]
+    if page:
+        saldos = saldos[10*(int(page)-1):]
     orcamentos = paginator.get_page(page)
     orcamentos_saldos = zip(orcamentos, saldos)
     return render(request, "lista_orcamentos_confirmados.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
@@ -950,7 +952,8 @@ def lista_orcamentos_pendentes(request):
         messages.add_message(request, messages.WARNING, f"Nenhum orçamento encontrado com o termo {termo_cliente}")
     paginator = Paginator(orcamentos, 10)
     page = request.GET.get('p')
-    saldos = saldos[10*(int(page)-1):]
+    if page:
+        saldos = saldos[10*(int(page)-1):]
     orcamentos = paginator.get_page(page)
     orcamentos_saldos = zip(orcamentos, saldos)
     return render(request, "lista_orcamentos_pendentes.html", {"orcamentos": orcamentos,"orcamentos_saldos":orcamentos_saldos})
