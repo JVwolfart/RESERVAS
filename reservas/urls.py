@@ -54,4 +54,5 @@ urlpatterns = [
     path('pdf_checkin/', views.pdf_checkin, name="pdf_checkin"),
     path('lista_reservas/', views.lista_reservas, name="lista_reservas"),
     path('pdf_reservas/', views.pdf_reservas, name="pdf_reservas"),
+    path('planilha/', views.planilha, name="planilha"),
 ]

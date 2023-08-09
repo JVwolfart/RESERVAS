@@ -84,6 +84,7 @@
                     <a href="{% url 'lista_gera_pdf_orcamento'%}" class="list-group-item list-group-item-action my-3">Gerar PDF orçamento</a>
                     <a href="{% url 'lista_orçamentos_concluidos'%}" class="list-group-item list-group-item-action my-3">Lista orçamentos concluídos/Gera contrato</a>
                     <a href="{% url 'lista_orçamentos_geral'%}" class="list-group-item list-group-item-action my-3">Lista todos os orçamentos</a>
+                    <a href="{% url 'planilha'%}" class="list-group-item list-group-item-action my-3">Agenda de reservas</a>
                   </ul>
                 </div>
               </div>
@@ -146,13 +147,19 @@
               </div>
             </div>
             
+            
 
           </div>
         </div>
       </div>
 
     </div>
-    
+
+      <div style="width: 99%; height: 100%; margin: 0 auto;">
+      {% block 'planilha'%}
+
+      {% endblock %}
+      </div>
 
       <div class="container">
        {% block 'conteudo'%}

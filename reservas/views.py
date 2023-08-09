@@ -1228,3 +1228,7 @@ def pdf_reservas(request):
         eliminado=True
     ).order_by("data_saida")
     return gera_pdf_reservas(data_inicial, data_final, orcamentos_entrada, orcamentos_saida)
+
+@login_required(login_url="login")
+def planilha(request):
+    return render(request, "planilha.html")
